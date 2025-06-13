@@ -70,9 +70,27 @@
                 text-decoration: none;
                 z-index: 1000;
             }
+
+            .site-header {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 20px;
+                z-index: 1000;
+            }
+
+            .site-logo {
+                height: 60px;
+                display: block;
+                width: auto;
+                opacity: 0.75;
+            }
         </style>
     </head>
     <body>
+        <header class="site-header">
+            <img src="assets/images/logo.svg" alt="Templia logo" class="site-logo" />
+        </header>
         <div class="bg">
             <div class="centered"></div>
         </div>
