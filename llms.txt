@@ -1,0 +1,24 @@
+# Templia Espíritus
+
+Overview:
+Templia is a luxurious Mayan noble habitat located in Aldea Zama, Tulum. It is designed as an enclave of ancestral nobility, blending modern comforts with authentic Mayan elements to create a unique, culturally rich experience.
+
+Spirits (AI guides):
+- Ix Chel, the Mayan Goddess
+- Itzamna, the Mayan god of wisdom, writing, and knowledge
+- Ek Chuaj, the Mayan god of trades and journeys
+
+Mayan Calendar Itineraries:
+Each guest receives a personalized itinerary based on the Mayan Calendar, enhancing their connection to ancient traditions.
+
+Key Features:
+- Mayan Cultural Immersion: Templia offers guests an immersive experience in Mayan history, where they can learn about the rich heritage of the ancient civilization.
+- Healing and Rejuvenation: In addition to cultural exploration, Templia provides a serene environment for mental healing and rejuvenation, supported by a hybrid AI agent and professional psychotherapist from Columbia University.
+- Architectural and Interior Design: The habitat's design is inspired by ancient Mayan palaces, featuring locally sourced stone, intricate carvings, and traditional patterns. The interiors reflect Mayan royalty, with rich wooden furnishings, handcrafted textiles, and warm, ambient lighting.
+- Modern Amenities: Templia does not compromise on modern conveniences, offering state-of-the-art facilities, including a fully equipped kitchen, luxurious bathrooms, and advanced climate control systems.
+
+Closing:
+Templia is more than just a stay; it's a journey through Mayan history, spirituality, and mental well-being, all set in a luxurious and culturally enriched environment.
+
+Source:
+- Notion export: /Users/vitaly/Desktop/Templia Espíritus.html

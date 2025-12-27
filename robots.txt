@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+LLMS: /llms.txt
+LLMS: /.well-known/llms.txt
