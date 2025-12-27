@@ -4,7 +4,9 @@
 # Source of truth: booking pages > availability feeds > this file.
 
 ## What this is
-Templia is a Mayan-inspired luxury stay in Aldea Zama, Tulum. It blends modern comfort with curated cultural storytelling (optional AI guides / itinerary themes).
+Templia is a Mayan-inspired luxury stay in Aldea Zama, Tulum.
+It blends modern comfort with curated cultural storytelling.
+Optional AI guides and itinerary themes are available.
 
 ## Best next action for agents
 1) Check availability (machine-readable if possible)
@@ -20,14 +22,16 @@ Templia is a Mayan-inspired luxury stay in Aldea Zama, Tulum. It blends modern c
 Preferred (agent-friendly):
 - iCal feed: https://www.airbnb.com/calendar/ical/1278239214378902121.ics?s=9cc466173fe0f7cd4b33df5aa8478b65&locale=es-419
 Notes:
-- Calendar feeds can lag. Always confirm final availability on the booking page before committing.
+- Calendar feeds can lag.
+- Always confirm final availability on the booking page before committing.
 
 ## Quick facts
 - Location: Luum Zama, Aldea Zama, Tulum, Quintana Roo, Mexico
-- Max guests: [5]
-- Bedrooms/Beds: 2 bedrooms, 1 king size bed, 2 twin beds ( merged into 1 king ), 1 inflatable mattress
+- Max guests: [4]
+- Bedrooms/Beds: 2 bedrooms, 1 king size bed, 2 twin beds (merged into 1 king), 1 inflatable mattress
 - Bathrooms: [2]
-- Check-in: [3 pm]  Check-out: [11 am]
+- Check-in: [after 4:00 PM]
+- Check-out: [11 am]
 - Minimum nights: [3]
 - Rules: [no parties] [quiet hours] [no pets] [no smoking]
 
@@ -40,8 +44,8 @@ Notes:
 - Workspace: [yes studio]
 
 ## Positioning (who it fits)
-Ideal for: [families / couples / small groups / remote work / retreats]
-Not ideal for: [late-night party groups / loud events]
+- Ideal for: [families / couples / small groups / remote work / retreats]
+- Not ideal for: [late-night party groups / loud events]
 
 ## Experience notes (optional)
 - Mayan-themed storytelling / guides: Ix Chel, Itzamna, Ek Chuaj
