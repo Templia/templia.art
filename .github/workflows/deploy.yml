@@ -31,15 +31,6 @@ jobs:
       # Overlay the original landing page over Next.js output
       - run: cp static-root/index.html out/index.html
 
-      # Ensure clean URLs: copy .html files as index.html inside slug directories
-      - run: |
-          for html_file in out/journey/*.html; do
-            slug=$(basename "$html_file" .html)
-            if [ -d "out/journey/$slug" ]; then
-              cp "$html_file" "out/journey/$slug/index.html"
-            fi
-          done
-
       # Ensure GitHub Pages serves _next directory
       - run: touch out/.nojekyll
 
