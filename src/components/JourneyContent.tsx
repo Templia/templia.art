@@ -272,27 +272,69 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
             </p>
           </div>
 
-          <div className="space-y-10">
-            {recommendations.map((rec, i) => (
-              <div key={i} className="text-center max-w-2xl mx-auto">
-                <h3 className="font-[family-name:var(--font-cormorant)] text-2xl md:text-3xl font-light gold-gradient-text mb-4">
-                  {rec.name}
-                </h3>
-                <p className="text-[#ededed]/60 leading-relaxed mb-3">
-                  {rec.description}
-                </p>
-                {rec.url && (
-                  <a
-                    href={rec.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block text-xs tracking-[0.3em] uppercase text-[#c9a84c]/50 hover:text-[#c9a84c]/80 transition-colors border-b border-[#c9a84c]/20 hover:border-[#c9a84c]/50 pb-0.5"
-                  >
-                    {ui.visitWebsite} →
-                  </a>
-                )}
-              </div>
-            ))}
+          <div className="space-y-16">
+            {recommendations.map((rec, i) => {
+              const pos = rec.logoPosition || "left";
+              const hasLogo = !!rec.logo;
+
+              return (
+                <div key={i} className="max-w-2xl mx-auto">
+                  {hasLogo ? (
+                    <div className="overflow-hidden">
+                      <img
+                        src={`/logos/${rec.logo}`}
+                        alt={rec.name}
+                        className={`w-28 md:w-36 h-auto opacity-80 mb-2 ${
+                          pos === "right"
+                            ? "float-right ml-6 md:ml-8"
+                            : "float-left mr-6 md:mr-8"
+                        }`}
+                        style={
+                          rec.logo?.includes("parque-del-jaguar")
+                            ? { filter: "invert(1)", mixBlendMode: "screen" as const }
+                            : { mixBlendMode: "lighten" as const }
+                        }
+                      />
+                      <h3 className="font-[family-name:var(--font-cormorant)] text-2xl md:text-3xl font-light gold-gradient-text mb-4">
+                        {rec.name}
+                      </h3>
+                      <p className="text-[#ededed]/60 leading-relaxed mb-3">
+                        {rec.description}
+                      </p>
+                      {rec.url && (
+                        <a
+                          href={rec.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block text-xs tracking-[0.3em] uppercase text-[#c9a84c]/50 hover:text-[#c9a84c]/80 transition-colors border-b border-[#c9a84c]/20 hover:border-[#c9a84c]/50 pb-0.5"
+                        >
+                          {ui.visitWebsite} →
+                        </a>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <h3 className="font-[family-name:var(--font-cormorant)] text-2xl md:text-3xl font-light gold-gradient-text mb-4">
+                        {rec.name}
+                      </h3>
+                      <p className="text-[#ededed]/60 leading-relaxed mb-3">
+                        {rec.description}
+                      </p>
+                      {rec.url && (
+                        <a
+                          href={rec.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block text-xs tracking-[0.3em] uppercase text-[#c9a84c]/50 hover:text-[#c9a84c]/80 transition-colors border-b border-[#c9a84c]/20 hover:border-[#c9a84c]/50 pb-0.5"
+                        >
+                          {ui.visitWebsite} →
+                        </a>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
       )}

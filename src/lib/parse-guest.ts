@@ -203,15 +203,23 @@ function parseRecommendations(text: string): Recommendation[] {
     const urlMatch = content.match(/^- \*\*URL\*\*:\s*(.+)$/m);
     const url = urlMatch ? urlMatch[1].trim() : undefined;
 
-    // Description is everything except the URL line
+    // Extract Logo if present (line starting with - **Logo**: ...)
+    const logoMatch = content.match(/^- \*\*Logo\*\*:\s*(.+)$/m);
+    const logo = logoMatch ? logoMatch[1].trim() : undefined;
+
+    // Extract Logo Position if present (line starting with - **Logo Position**: ...)
+    const posMatch = content.match(/^- \*\*Logo Position\*\*:\s*(.+)$/m);
+    const logoPosition = posMatch ? (posMatch[1].trim() as "left" | "right") : undefined;
+
+    // Description is everything except the URL, Logo, and Logo Position lines
     const description = content
       .split("\n")
-      .filter((line) => !line.match(/^- \*\*URL\*\*/))
+      .filter((line) => !line.match(/^- \*\*(URL|Logo|Logo Position)\*\*/))
       .map((l) => l.trim())
       .filter(Boolean)
       .join(" ");
 
-    recommendations.push({ name, description, url });
+    recommendations.push({ name, description, url, logo, logoPosition });
   }
   return recommendations;
 }

@@ -37,6 +37,8 @@ export interface Recommendation {
   name: string;
   description: string;
   url?: string;
+  logo?: string;
+  logoPosition?: "left" | "right";
 }
 
 export interface GuestJourney {
