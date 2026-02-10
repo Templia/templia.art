@@ -156,7 +156,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
               <div className="mayan-divider-thick w-full mb-16" />
 
               <div className="text-center mb-12">
-                <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/40 mb-4">
+                <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/70 mb-4">
                   {ui.day} {dayIndex + 1} · {formatDateShortLocale(date, locale)}
                 </p>
 
