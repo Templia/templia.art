@@ -9,6 +9,9 @@ export const UI_STRINGS: Record<Locale, {
   integration: string;
   subtitle: string;
   preparedFor: string;
+  discover: string;
+  discoverSubtitle: string;
+  visitWebsite: string;
   footerText: string;
 }> = {
   en: {
@@ -19,6 +22,9 @@ export const UI_STRINGS: Record<Locale, {
     integration: "Integration",
     subtitle: "A Tzolkin-Guided Journey",
     preparedFor: "For",
+    discover: "Discover",
+    discoverSubtitle: "Places that deepen your connection to this land",
+    visitWebsite: "Learn more",
     footerText: "This journey is shaped by ancestral Maya knowledge and conveyed through the sacred timing of the Tzolk\u2019in calendar.",
   },
   es: {
@@ -29,6 +35,9 @@ export const UI_STRINGS: Record<Locale, {
     integration: "Integración",
     subtitle: "Un Viaje Guiado por el Tzolkin",
     preparedFor: "Para",
+    discover: "Descubre",
+    discoverSubtitle: "Lugares que profundizan tu conexión con esta tierra",
+    visitWebsite: "Conoce más",
     footerText: "Este viaje est\u00e1 moldeado por el conocimiento ancestral maya y transmitido a trav\u00e9s de la cadencia sagrada del calendario Tzolk\u2019in.",
   },
 };

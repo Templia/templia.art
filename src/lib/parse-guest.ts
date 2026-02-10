@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { type GuestJourney, type JourneyDay, type GuestNawal, type JourneyIntegration } from "./journeys";
+import { type GuestJourney, type JourneyDay, type GuestNawal, type JourneyIntegration, type Recommendation } from "./journeys";
 
 const GUESTS_DIR = path.join(process.cwd(), "guests");
 
@@ -190,6 +190,32 @@ function parseIntegration(text: string): { en: JourneyIntegration; es?: JourneyI
   return { en, es };
 }
 
+function parseRecommendations(text: string): Recommendation[] {
+  const recommendations: Recommendation[] = [];
+  // Split by ## headings to get individual recommendations
+  const parts = text.split(/^## /m).filter(Boolean);
+  for (const part of parts) {
+    const newline = part.indexOf("\n");
+    const name = part.slice(0, newline).trim();
+    const content = part.slice(newline + 1).trim();
+
+    // Extract URL if present (line starting with - **URL**: ...)
+    const urlMatch = content.match(/^- \*\*URL\*\*:\s*(.+)$/m);
+    const url = urlMatch ? urlMatch[1].trim() : undefined;
+
+    // Description is everything except the URL line
+    const description = content
+      .split("\n")
+      .filter((line) => !line.match(/^- \*\*URL\*\*/))
+      .map((l) => l.trim())
+      .filter(Boolean)
+      .join(" ");
+
+    recommendations.push({ name, description, url });
+  }
+  return recommendations;
+}
+
 function parseWelcome(text: string): string {
   // Convert paragraph breaks to \n\n
   return text
@@ -247,6 +273,10 @@ export function parseGuestFile(filename: string): { slug: string; journey: Guest
     ? parseIntegration(sections["Integration"])
     : { en: { title: "", bodyText: "", dayThreads: [], closingText: "" } };
 
+  // Recommendations
+  const recsEn = sections["Recommendations"] ? parseRecommendations(sections["Recommendations"]) : undefined;
+  const recsEs = sections["Recommendations (es)"] ? parseRecommendations(sections["Recommendations (es)"]) : undefined;
+
   const journey: GuestJourney = {
     guestName: frontmatter.guest,
     locationName: frontmatter.location,
@@ -257,6 +287,7 @@ export function parseGuestFile(filename: string): { slug: string; journey: Guest
     nawal: nawalEn,
     days: enDays,
     integration: integrationData.en,
+    recommendations: recsEn,
   };
 
   // Add Spanish if available
@@ -266,6 +297,7 @@ export function parseGuestFile(filename: string): { slug: string; journey: Guest
       nawal: nawalEs,
       days: esDays,
       integration: integrationData.es,
+      recommendations: recsEs,
     };
   }
 

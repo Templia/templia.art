@@ -25,6 +25,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
   const days = locale === "es" && journey.es ? journey.es.days : journey.days;
   const integration = locale === "es" && journey.es ? journey.es.integration : journey.integration;
   const welcomeMessage = locale === "es" && journey.es?.welcomeMessage ? journey.es.welcomeMessage : journey.welcomeMessage;
+  const recommendations = locale === "es" && journey.es?.recommendations ? journey.es.recommendations : journey.recommendations;
 
   const checkInDate = new Date(journey.checkIn + "T12:00:00");
   const checkOutDate = new Date(journey.checkOut + "T12:00:00");
@@ -258,6 +259,43 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
           </p>
         </div>
       </section>
+
+      {/* ═══ DISCOVER SECTION ═══ */}
+      {recommendations && recommendations.length > 0 && (
+        <section className="relative px-6 py-20 max-w-3xl mx-auto">
+          <div className="mayan-divider w-24 mx-auto mb-12" />
+
+          <div className="text-center mb-12">
+            <p className="text-xs tracking-[0.5em] uppercase text-[#c9a84c]/40 mb-6">{ui.discover}</p>
+            <p className="font-[family-name:var(--font-cormorant)] text-xl italic text-[#ededed]/40">
+              {ui.discoverSubtitle}
+            </p>
+          </div>
+
+          <div className="space-y-10">
+            {recommendations.map((rec, i) => (
+              <div key={i} className="text-center max-w-2xl mx-auto">
+                <h3 className="font-[family-name:var(--font-cormorant)] text-2xl md:text-3xl font-light gold-gradient-text mb-4">
+                  {rec.name}
+                </h3>
+                <p className="text-[#ededed]/60 leading-relaxed mb-3">
+                  {rec.description}
+                </p>
+                {rec.url && (
+                  <a
+                    href={rec.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block text-xs tracking-[0.3em] uppercase text-[#c9a84c]/50 hover:text-[#c9a84c]/80 transition-colors border-b border-[#c9a84c]/20 hover:border-[#c9a84c]/50 pb-0.5"
+                  >
+                    {ui.visitWebsite} →
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <footer className="px-6 py-12 text-center border-t border-[#c9a84c]/10">
         <p className="text-xs text-[#ededed]/20 tracking-[0.2em]">
