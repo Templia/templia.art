@@ -64,7 +64,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
 
         {journey.guestName ? (
           <>
-            <p className="text-xs tracking-[0.5em] uppercase text-[#c9a84c]/50 mb-3 animate-fade-in-up animation-delay-500">
+            <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/50 mb-3 animate-fade-in-up animation-delay-500">
               {ui.preparedFor}
             </p>
             <p className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light text-[#ededed] mb-4 animate-fade-in-up animation-delay-500">
@@ -101,7 +101,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
       {/* ═══ YOUR NAWAL SECTION ═══ */}
       <section className="relative px-6 py-20 max-w-3xl mx-auto">
         <div className="text-center mb-12">
-          <p className="text-xs tracking-[0.5em] uppercase text-[#c9a84c]/50 mb-6">{ui.yourNawal}</p>
+          <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/50 mb-6">{ui.yourNawal}</p>
 
           {(() => {
             const nawalNameRaw = journey.nawal.displayName.split("·")[0].trim().split(" ").slice(1).join(" ").replace(/\u2019/g, "'");
@@ -126,7 +126,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
             {nawal.toneName}
           </p>
           {nawal.birthday && (
-            <p className="text-xs text-[#ededed]/30 mt-1">
+            <p className="text-sm text-[#ededed]/30 mt-1">
               {ui.birthday}: {nawal.birthday}
             </p>
           )}
@@ -156,7 +156,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
               <div className="mayan-divider-thick w-full mb-16" />
 
               <div className="text-center mb-12">
-                <p className="text-xs tracking-[0.5em] uppercase text-[#c9a84c]/40 mb-4">
+                <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/40 mb-4">
                   {ui.day} {dayIndex + 1} · {formatDateShortLocale(date, locale)}
                 </p>
 
@@ -180,7 +180,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                   {tzolkin.daySign.themes.map((theme) => (
                     <span
                       key={theme}
-                      className="text-xs tracking-[0.2em] uppercase px-4 py-1.5 border border-[#c9a84c]/20 text-[#c9a84c]/60 rounded-full"
+                      className="text-sm tracking-[0.2em] uppercase px-4 py-1.5 border border-[#c9a84c]/20 text-[#c9a84c]/60 rounded-full"
                     >
                       {getThemeLocalized(theme)}
                     </span>
@@ -200,7 +200,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                 {day.activities.map((activity, actIndex) => (
                   <div key={actIndex} className="relative pl-8 border-l border-[#c9a84c]/15">
                     <div className="absolute left-0 top-1 w-2 h-2 -translate-x-[5px] rounded-full bg-[#c9a84c]/40" />
-                    <p className="text-xs tracking-[0.3em] uppercase text-[#c9a84c]/50 mb-2">
+                    <p className="text-sm tracking-[0.3em] uppercase text-[#c9a84c]/50 mb-2">
                       {activity.timeOfDay}
                     </p>
                     <p className="text-[#ededed]/60 leading-relaxed">
@@ -219,7 +219,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
         <div className="mayan-divider-thick w-full mb-16" />
 
         <div className="text-center mb-12">
-          <p className="text-xs tracking-[0.5em] uppercase text-[#c9a84c]/40 mb-6">{ui.integration}</p>
+          <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/40 mb-6">{ui.integration}</p>
           <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-4">
             {integration.title}
           </h2>
@@ -235,7 +235,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                 <p className="font-[family-name:var(--font-cormorant)] text-lg font-medium gold-gradient-text">
                   {thread.displayName}
                 </p>
-                <p className="text-xs text-[#ededed]/30 uppercase tracking-wider">
+                <p className="text-sm text-[#ededed]/30 uppercase tracking-wider">
                   {thread.englishName}
                 </p>
               </div>
@@ -254,7 +254,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
 
         <div className="text-center mt-16">
           <div className="text-2xl opacity-30 mb-4">✦ ✦ ✦</div>
-          <p className="text-xs tracking-[0.4em] uppercase text-[#c9a84c]/30">
+          <p className="text-sm tracking-[0.4em] uppercase text-[#c9a84c]/30">
             {journey.locationName}
           </p>
         </div>
@@ -266,7 +266,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
           <div className="mayan-divider w-24 mx-auto mb-12" />
 
           <div className="text-center mb-12">
-            <p className="text-xs tracking-[0.5em] uppercase text-[#c9a84c]/40 mb-6">{ui.discover}</p>
+            <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/40 mb-6">{ui.discover}</p>
             <p className="font-[family-name:var(--font-cormorant)] text-xl italic text-[#ededed]/40">
               {ui.discoverSubtitle}
             </p>
@@ -306,7 +306,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                           href={rec.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-block text-xs tracking-[0.3em] uppercase text-[#c9a84c]/50 hover:text-[#c9a84c]/80 transition-colors border-b border-[#c9a84c]/20 hover:border-[#c9a84c]/50 pb-0.5"
+                          className="inline-block text-sm tracking-[0.3em] uppercase text-[#c9a84c]/50 hover:text-[#c9a84c]/80 transition-colors border-b border-[#c9a84c]/20 hover:border-[#c9a84c]/50 pb-0.5"
                         >
                           {ui.visitWebsite} →
                         </a>
@@ -325,7 +325,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                           href={rec.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-block text-xs tracking-[0.3em] uppercase text-[#c9a84c]/50 hover:text-[#c9a84c]/80 transition-colors border-b border-[#c9a84c]/20 hover:border-[#c9a84c]/50 pb-0.5"
+                          className="inline-block text-sm tracking-[0.3em] uppercase text-[#c9a84c]/50 hover:text-[#c9a84c]/80 transition-colors border-b border-[#c9a84c]/20 hover:border-[#c9a84c]/50 pb-0.5"
                         >
                           {ui.visitWebsite} →
                         </a>
@@ -340,7 +340,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
       )}
 
       <footer className="px-6 py-12 text-center border-t border-[#c9a84c]/10">
-        <p className="text-xs text-[#ededed]/20 tracking-[0.2em]">
+        <p className="text-sm text-[#ededed]/20 tracking-[0.2em]">
           {ui.footerText}
         </p>
       </footer>
