@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Templia</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+            integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0"
+            crossorigin="anonymous"
+        />
+        <link rel="alternate" type="text/plain" href="/llms.txt" title="LLMs.txt" />
+        <link rel="alternate" type="text/plain" href="/.well-known/llms.txt" title="LLMs.txt (well-known)" />
+        <link rel="llms" href="/llms.txt" />
+        <link rel="llms" href="/.well-known/llms.txt" />
+        <style>
+            body,
+            html {
+                height: 100%;
+                margin: 0;
+            }
+
+            .bg {
+                /* The image used */
+                background-image: url("assets/images/image00015.jpg");
+
+                /* Full height */
+                height: 100%;
+
+                /* Center and scale the image nicely */
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+            }
+
+            .airbnb-logo {
+                position: fixed;
+                bottom: 60px;
+                right: 50px;
+                font-size: 3.1625em;
+                color: #000000;
+                text-decoration: none;
+                z-index: 1000;
+            }
+
+            .instagram-logo {
+                position: fixed;
+                bottom: 60px;
+                right: 110px; /* place it to the left of the Airbnb icon */
+                font-size: 3.1625em;
+                color: #000000;
+                text-decoration: none;
+                z-index: 1000;
+            }
+
+            .site-header {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 20px;
+                z-index: 1000;
+            }
+
+            .site-logo {
+                height: 60px;
+                display: block;
+                width: auto;
+                opacity: 0.75;
+            }
+        </style>
+    </head>
+    <body>
+        <header class="site-header">
+            <img src="assets/images/logo.svg" alt="Templia logo" class="site-logo" />
+        </header>
+        <div class="bg">
+        </div>
+        <a
+            href="https://stay.templia.art"
+            class="airbnb-logo"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Book on Airbnb"
+        >
+            <i class="fab fa-airbnb"></i>
+        </a>
+        <a
+            href="https://www.instagram.com/templia.art/"
+            class="instagram-logo"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Templia on Instagram"
+        >
+            <i class="fab fa-instagram"></i>
+        </a>
+    </body>
+</html>

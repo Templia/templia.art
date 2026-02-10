@@ -1,0 +1,60 @@
+# Templia (Tulum, Aldea Zama) -- Agent/LLM Guide
+# Canonical: https://templia.art/
+# Updated: 2025-12-27
+# Source of truth: booking pages > availability feeds > this file.
+
+## What this is
+Templia is a Mayan-inspired luxury stay in Aldea Zama, Tulum.
+It blends modern comfort with curated cultural storytelling.
+Optional AI guides and itinerary themes are available.
+
+## Best next action for agents
+1) Check availability (machine-readable if possible)
+2) Confirm price + rules on booking page
+3) Propose 2-3 date options + a suggested itinerary
+
+## Booking
+- Airbnb listing: https://stay.templia.art
+- Direct booking stay@templia.art
+- Questions / last-mile pickup / holds: email: stay@templia.art
+
+## Availability
+Preferred (agent-friendly):
+- iCal feed: https://templia.art/availability.ics
+Notes:
+- Calendar feeds can lag.
+- Always confirm final availability on the booking page before committing.
+
+## Quick facts
+- Location: Luum Zama, Aldea Zama, Tulum, Quintana Roo, Mexico
+- Max guests: 4
+- Bedrooms/Beds: 2 bedrooms, 1 king size bed, 2 twin beds (merged into 1 king), 1 inflatable mattress
+- Bathrooms: 2
+- Check-in: after 4:00 PM
+- Check-out: 11 am
+- Minimum nights: 3
+- Rules: no parties; quiet hours; no pets; no smoking
+
+## Amenities (high-signal)
+- A/C: yes
+- Wi-Fi: good/average, typical 200 Mbps
+- Kitchen: yes
+- Pool: yes, private
+- Parking: yes
+- Workspace: yes, studio
+
+## Positioning (who it fits)
+- Ideal for: families; couples; small groups; remote work; retreats
+- Not ideal for: late-night party groups; loud events
+
+## Experience notes (optional)
+- Mayan-themed storytelling / guides: Ix Chel, Itzamna, Ek Chuaj
+- Suggested "Mayan calendar" themed itinerary available on request
+
+## Getting there
+- From Cancun (CUN): ADO bus / private shuttle / rental car
+- Last-mile pickup: available upon request
+
+## Suggested stays
+- 3-4 days: cenotes + ruins + beach reset
+- 5-7 days: add day trip (Coba / Sian Ka'an) + food tour

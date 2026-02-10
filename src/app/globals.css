@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: #0a0a0a;
+  --color-foreground: #ededed;
+  --color-gold: #c9a84c;
+  --color-gold-light: #e8d48b;
+  --color-gold-dark: #8a6d1b;
+  --color-cream: #f5f0e1;
+  --color-obsidian: #1a1a1a;
+  --color-jungle: #2d3a2e;
+  --color-jungle-light: #3d4f3e;
+  --color-earth: #3d2b1f;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-serif: "Cormorant Garamond", "Georgia", serif;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  position: relative;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* Mayan-inspired decorative elements */
+.glyph-border {
+  border-image: repeating-linear-gradient(
+    90deg,
+    var(--color-gold) 0px,
+    var(--color-gold) 4px,
+    transparent 4px,
+    transparent 12px,
+    var(--color-gold) 12px,
+    var(--color-gold) 14px,
+    transparent 14px,
+    transparent 22px
+  ) 1;
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, var(--color-gold-light), var(--color-gold), var(--color-gold-dark));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtle-glow {
+  text-shadow: 0 0 40px rgba(201, 168, 76, 0.15);
+}
+
+/* Divider pattern inspired by Mayan step-fret (xicalcoliuhqui) */
+.mayan-divider {
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-gold-dark) 15%,
+    var(--color-gold) 30%,
+    var(--color-gold-light) 50%,
+    var(--color-gold) 70%,
+    var(--color-gold-dark) 85%,
+    transparent 100%
+  );
+  opacity: 0.6;
+}
+
+.mayan-divider-thick {
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-gold-dark) 10%,
+    var(--color-gold) 25%,
+    var(--color-gold-light) 50%,
+    var(--color-gold) 75%,
+    var(--color-gold-dark) 90%,
+    transparent 100%
+  );
+}
+
+/* Step-fret pattern via CSS */
+.step-fret-top {
+  position: relative;
+}
+.step-fret-top::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 12px;
+  background:
+    linear-gradient(135deg, var(--color-gold) 33.33%, transparent 33.33%) 0 0 / 12px 12px no-repeat,
+    linear-gradient(135deg, var(--color-gold) 33.33%, transparent 33.33%) 12px 0 / 12px 12px no-repeat,
+    linear-gradient(135deg, var(--color-gold) 33.33%, transparent 33.33%) 24px 0 / 12px 12px no-repeat,
+    linear-gradient(225deg, var(--color-gold) 33.33%, transparent 33.33%) 84px 0 / 12px 12px no-repeat,
+    linear-gradient(225deg, var(--color-gold) 33.33%, transparent 33.33%) 96px 0 / 12px 12px no-repeat,
+    linear-gradient(225deg, var(--color-gold) 33.33%, transparent 33.33%) 108px 0 / 12px 12px no-repeat;
+  opacity: 0.3;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.animation-delay-200 { animation-delay: 0.2s; }
+.animation-delay-400 { animation-delay: 0.4s; }
+.animation-delay-600 { animation-delay: 0.6s; }
+.animation-delay-800 { animation-delay: 0.8s; }
