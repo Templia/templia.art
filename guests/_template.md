@@ -59,6 +59,24 @@ subtitle: Aldea Zama
 
 ---
 
+# Recommendations
+
+## [Place Name]
+
+[Description of the place and why it matters]
+
+- **URL**: [https://example.com]
+
+# Recommendations (es)
+
+## [Nombre del Lugar]
+
+[Descripción del lugar y por qué importa]
+
+- **URL**: [https://example.com]
+
+---
+
 # Integration
 
 ## [English Title]

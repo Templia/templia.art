@@ -33,6 +33,12 @@ export interface JourneyIntegration {
   closingText: string;
 }
 
+export interface Recommendation {
+  name: string;
+  description: string;
+  url?: string;
+}
+
 export interface GuestJourney {
   guestName?: string;
   locationName: string;
@@ -43,12 +49,14 @@ export interface GuestJourney {
   nawal: GuestNawal;
   days: JourneyDay[];
   integration: JourneyIntegration;
+  recommendations?: Recommendation[];
   // Spanish translations
   es?: {
     welcomeMessage?: string;
     nawal: GuestNawal;
     days: JourneyDay[];
     integration: JourneyIntegration;
+    recommendations?: Recommendation[];
   };
 }
 
