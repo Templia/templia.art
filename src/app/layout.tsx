@@ -14,8 +14,18 @@ const cormorant = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://templia.art"),
   title: "Templia Art · Tzolkin-Guided Journey",
   description: "Your personalized sacred calendar journey at Templia Art",
+  openGraph: {
+    siteName: "Templia Art",
+    type: "website",
+    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "Templia Art · Tzolkin-Guided Journey" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og-image.jpg"],
+  },
 };
 
 export default function RootLayout({
