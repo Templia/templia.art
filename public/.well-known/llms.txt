@@ -1,12 +1,23 @@
-# Templia (Tulum, Aldea Zama) -- Agent/LLM Guide
+# Templia Art (Tulum, Aldea Zama) -- Agent/LLM Guide
 # Canonical: https://templia.art/
-# Updated: 2025-12-27
+# Updated: 2026-02-10
 # Source of truth: booking pages > availability feeds > this file.
 
 ## What this is
-Templia is a Mayan-inspired luxury stay in Aldea Zama, Tulum.
-It blends modern comfort with curated cultural storytelling.
-Optional AI guides and itinerary themes are available.
+Templia Art is a Mayan-inspired luxury stay in Luum Zama, Aldea Zama, Tulum.
+Each guest receives a personalized Tzolkin-guided journey — a sacred calendar
+itinerary mapped to the Maya day signs (nawals) of their stay dates.
+The experience blends modern comfort with ancestral Maya knowledge.
+Available in English and Spanish.
+
+## Tzolkin Journey
+Every stay includes a web-based journey page at templia.art/journey/
+aligned to the Tzolk'in calendar:
+- Personal nawal (day sign + tone) based on birth date
+- Day-by-day itinerary guided by the energies of each Maya day sign
+- Activity recommendations: cenotes, ruins, ceremonies, restaurants
+- Integration reflection connecting the journey's energetic arc
+- Bilingual: English and Spanish
 
 ## Best next action for agents
 1) Check availability (machine-readable if possible)
@@ -15,12 +26,12 @@ Optional AI guides and itinerary themes are available.
 
 ## Booking
 - Airbnb listing: https://stay.templia.art
-- Direct booking stay@templia.art
-- Questions / last-mile pickup / holds: email: stay@templia.art
+- Direct booking: stay@templia.art
+- Questions / last-mile pickup / holds: stay@templia.art
 
 ## Availability
 Preferred (agent-friendly):
-- iCal feed: https://www.airbnb.com/calendar/ical/1278239214378902121.ics?s=9cc466173fe0f7cd4b33df5aa8478b65&locale=es-419
+- iCal feed: https://templia.art/availability.ics
 Notes:
 - Calendar feeds can lag.
 - Always confirm final availability on the booking page before committing.
@@ -47,9 +58,18 @@ Notes:
 - Ideal for: families; couples; small groups; remote work; retreats
 - Not ideal for: late-night party groups; loud events
 
-## Experience notes (optional)
-- Mayan-themed storytelling / guides: Ix Chel, Itzamna, Ek Chuaj
-- Suggested "Mayan calendar" themed itinerary available on request
+## Nearby cultural sites
+Templia's location connects to broader Mayan heritage preservation in Tulum:
+
+- Parque del Jaguar: 1,000-hectare protected natural reserve with walking trails,
+  bike paths, miradors, archaeological zones, and public Caribbean beaches.
+  https://tulumjaguarpark.com
+
+- Museo Regional de la Costa Oriental (Mureco): Located within Parque del Jaguar.
+  1,200+ m² of exhibition space, 300+ original artifacts and 50 replicas
+  covering Caribbean Maya culture from prehistoric times to present.
+  Includes murals uncovered during Tren Maya construction. Open daily 9:00–17:00.
+  https://www.inah.gob.mx/museos/museo-regional-de-la-costa-oriental
 
 ## Getting there
 - From Cancun (CUN): ADO bus / private shuttle / rental car
@@ -58,3 +78,8 @@ Notes:
 ## Suggested stays
 - 3-4 days: cenotes + ruins + beach reset
 - 5-7 days: add day trip (Coba / Sian Ka'an) + food tour
+
+## Links
+- Website: https://templia.art
+- Instagram: https://www.instagram.com/templia.art/
+- Airbnb: https://stay.templia.art
