@@ -214,7 +214,7 @@ function parseRecommendations(text: string): Recommendation[] {
     // Description is everything except the URL, Logo, and Logo Position lines
     const description = content
       .split("\n")
-      .filter((line) => !line.match(/^- \*\*(URL|Logo|Logo Position)\*\*/))
+      .filter((line) => !line.match(/^- \*\*(URL|Logo|Logo Position)\*\*/) && line.trim() !== "---")
       .map((l) => l.trim())
       .filter(Boolean)
       .join(" ");

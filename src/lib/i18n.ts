@@ -140,3 +140,11 @@ export function formatDateShortLocale(date: Date, locale: Locale): string {
     year: "numeric",
   });
 }
+
+export function formatDateShortMobileLocale(date: Date, locale: Locale): string {
+  return date.toLocaleDateString(locale === "es" ? "es-MX" : "en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
