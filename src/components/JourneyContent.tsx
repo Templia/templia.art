@@ -53,7 +53,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
 
         <div className="mayan-divider-thick w-48 mb-12 animate-fade-in-up" />
 
-        <p className="text-sm tracking-[0.4em] uppercase text-[#c9a84c]/60 mb-4 animate-fade-in-up animation-delay-200">
+        <p className="text-sm tracking-[0.4em] uppercase text-[#c9a84c]/35 mb-4 animate-fade-in-up animation-delay-200">
           {journey.locationSubtitle}
         </p>
         <h1 className="font-[family-name:var(--font-cormorant)] text-5xl md:text-7xl font-light tracking-wide text-center gold-gradient-text animate-fade-in-up animation-delay-400">
