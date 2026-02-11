@@ -11,6 +11,8 @@ export const UI_STRINGS: Record<Locale, {
   preparedFor: string;
   discover: string;
   discoverSubtitle: string;
+  discoverIntro: string;
+  discoverClosing: string;
   visitWebsite: string;
   footerText: string;
 }> = {
@@ -23,9 +25,11 @@ export const UI_STRINGS: Record<Locale, {
     subtitle: "A Tzolkin-Guided Journey",
     preparedFor: "For",
     discover: "Discover",
-    discoverSubtitle: "Places that deepen your connection to this land",
+    discoverSubtitle: "Templia\u2019s integration into Mayan cultural preservation aligns with several initiatives in Tulum aimed at promoting Mayan heritage.",
+    discoverIntro: "Nearby, two of the most significant expressions of this effort \u2014 Parque del Jaguar and the Museo Regional de la Costa Oriental \u2014 offer direct access to the land, history, and worldview that shaped this region.",
+    discoverClosing: "These projects, among others, demonstrate a unified effort in Tulum to preserve and promote Mayan heritage, providing both residents and visitors with opportunities to engage deeply with the region\u2019s cultural legacy.",
     visitWebsite: "Learn more",
-    footerText: "This journey is shaped by ancestral Maya knowledge and conveyed through the sacred timing of the Tzolk\u2019in calendar.",
+    footerText: "This journey is shaped by ancestral Maya knowledge\nand conveyed through the sacred timing of the Tzolk\u2019in calendar.",
   },
   es: {
     yourNawal: "Tu Nawal",
@@ -36,9 +40,11 @@ export const UI_STRINGS: Record<Locale, {
     subtitle: "Un Viaje Guiado por el Tzolkin",
     preparedFor: "Para",
     discover: "Descubre",
-    discoverSubtitle: "Lugares que profundizan tu conexión con esta tierra",
+    discoverSubtitle: "La integración de Templia en la preservación cultural maya se alinea con varias iniciativas en Tulum orientadas a promover el patrimonio maya.",
+    discoverIntro: "Cerca de aquí, dos de las expresiones más significativas de este esfuerzo \u2014 el Parque del Jaguar y el Museo Regional de la Costa Oriental \u2014 ofrecen acceso directo a la tierra, la historia y la cosmovisión que dieron forma a esta región.",
+    discoverClosing: "Estos proyectos, entre otros, demuestran un esfuerzo unificado en Tulum por preservar y promover el patrimonio maya, brindando tanto a residentes como a visitantes oportunidades para conectar profundamente con el legado cultural de la región.",
     visitWebsite: "Conoce más",
-    footerText: "Este viaje est\u00e1 moldeado por el conocimiento ancestral maya y transmitido a trav\u00e9s de la cadencia sagrada del calendario Tzolk\u2019in.",
+    footerText: "Este viaje est\u00e1 moldeado por el conocimiento ancestral maya\ny transmitido a trav\u00e9s de la cadencia sagrada del calendario Tzolk\u2019in.",
   },
 };
 

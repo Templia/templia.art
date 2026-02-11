@@ -262,14 +262,22 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
 
       {/* ═══ DISCOVER SECTION ═══ */}
       {recommendations && recommendations.length > 0 && (
-        <section className="relative px-6 py-20 max-w-3xl mx-auto">
-          <div className="mayan-divider w-24 mx-auto mb-12" />
+        <section className="relative px-6 py-12 max-w-3xl mx-auto">
+          <div className="mayan-divider-thick w-full mb-12" />
 
           <div className="text-center mb-12">
             <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/40 mb-6">{ui.discover}</p>
-            <p className="font-[family-name:var(--font-cormorant)] text-xl italic text-[#ededed]/55">
+          </div>
+
+          <div className="max-w-2xl mx-auto mb-14 space-y-6">
+            <p className="text-[#ededed]/75 leading-relaxed">
               {ui.discoverSubtitle}
             </p>
+            {ui.discoverIntro && (
+              <p className="text-[#ededed]/75 leading-relaxed">
+                {ui.discoverIntro}
+              </p>
+            )}
           </div>
 
           <div className="space-y-16">
@@ -336,13 +344,49 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
               );
             })}
           </div>
+
+          <div className="max-w-2xl mx-auto mt-14">
+            <blockquote className="border-l-2 border-[#c9a84c]/30 pl-6">
+              <p className="font-[family-name:var(--font-cormorant)] text-lg md:text-xl italic text-[#ededed]/65 leading-relaxed">
+                {ui.discoverClosing}
+              </p>
+            </blockquote>
+          </div>
         </section>
       )}
 
-      <footer className="px-6 py-12 text-center border-t border-[#c9a84c]/10">
-        <p className="text-sm text-[#ededed]/35 tracking-[0.2em]">
-          {ui.footerText}
-        </p>
+      <footer className="px-6 py-12 border-t border-[#c9a84c]/10">
+        <div className="flex items-center gap-8 max-w-3xl mx-auto">
+          <div className="flex gap-5 shrink-0">
+          <a
+            href="https://www.instagram.com/templia.art/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#ededed]/40 hover:text-[#c9a84c]/70 transition-colors"
+            aria-label="Instagram"
+          >
+            <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+            </svg>
+          </a>
+          <a
+            href="https://stay.templia.art"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#ededed]/40 hover:text-[#c9a84c]/70 transition-colors"
+            aria-label="Airbnb"
+          >
+            <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 448 512">
+              <path d="M224 373.12c-25.24-31.67-40.08-59.43-45-83.18-22.55-88 112.61-88 90.06 0-5.45 24.25-20.29 52-45 83.18zm138.15 73.23c-42.06 18.31-83.67-10.88-119.3-50.47 103.9-130.07 46.11-200-18.85-200-54.92 0-85.16 46.51-73.28 100.5 6.93 29.19 25.23 62.39 54.43 99.5-32.53 36.05-60.55 52.69-85.15 54.92-50 7.43-89.11-41.06-71.3-91.09 15.1-39.16 111.72-231.18 115.87-241.56 15.75-30.07 25.56-57.4 59.38-57.4 32.34 0 43.4 25.94 60.37 59.87 36 70.62 89.35 177.48 114.84 239.09 13.17 33.07-1.37 71.29-37.01 86.64zm47-136.12C280.27 35.93 273.13 32 224 32c-45.52 0-64.87 31.67-84.66 72.79C33.18 317.1 22.89 347.19 22 349.81-3.22 419.14 48.74 480 111.63 480c21.71 0 60.61-6.06 112.37-62.4 58.68 63.78 101.26 62.4 112.37 62.4 62.89.05 114.85-60.86 89.61-130.19.02-3.89-16.82-38.9-16.82-39.58z"/>
+            </svg>
+          </a>
+          </div>
+          <p className="text-sm text-[#ededed]/35 tracking-[0.2em] text-left leading-relaxed">
+            {ui.footerText.split("\n").map((line, i, arr) => (
+              <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+            ))}
+          </p>
+        </div>
       </footer>
     </main>
   );
