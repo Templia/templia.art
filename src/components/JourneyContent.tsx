@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { type GuestJourney } from "@/lib/journeys";
 import { getTzolkinDate, getGlyphPath, getDaySignByName } from "@/lib/tzolkin";
-import { type Locale, UI_STRINGS, DAY_SIGN_NAMES_ES, THEMES_ES, formatDateShortLocale } from "@/lib/i18n";
+import { type Locale, UI_STRINGS, DAY_SIGN_NAMES_ES, THEMES_ES, formatDateShortLocale, formatDateShortMobileLocale } from "@/lib/i18n";
 import { LanguageToggle } from "./LanguageToggle";
 
 function getInitialLocale(searchParams: URLSearchParams): Locale {
@@ -53,7 +53,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
 
         <div className="mayan-divider-thick w-48 mb-12 animate-fade-in-up" />
 
-        <p className="text-sm tracking-[0.4em] uppercase text-[#c9a84c]/35 mb-4 animate-fade-in-up animation-delay-200">
+        <p className="text-xs md:text-sm tracking-[0.2em] md:tracking-[0.4em] uppercase text-[#c9a84c]/35 mb-4 animate-fade-in-up animation-delay-200">
           {journey.locationSubtitle}
         </p>
         <h1 className="font-[family-name:var(--font-cormorant)] text-5xl md:text-7xl font-light tracking-wide text-center gold-gradient-text animate-fade-in-up animation-delay-400">
@@ -80,8 +80,11 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
           </p>
         )}
 
-        <p className="text-sm tracking-[0.25em] uppercase text-[#ededed]/65 animate-fade-in-up animation-delay-800">
+        <p className="hidden md:block text-sm tracking-[0.25em] uppercase text-[#ededed]/65 animate-fade-in-up animation-delay-800">
           {formatDateShortLocale(checkInDate, locale)} – {formatDateShortLocale(checkOutDate, locale)}
+        </p>
+        <p className="md:hidden text-sm tracking-[0.25em] uppercase text-[#ededed]/65 animate-fade-in-up animation-delay-800">
+          {formatDateShortMobileLocale(checkInDate, locale)} – {formatDateShortMobileLocale(checkOutDate, locale)}
         </p>
 
         <div className="mayan-divider w-32 mt-12 animate-fade-in-up animation-delay-800" />
@@ -156,8 +159,11 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
               <div className="mayan-divider-thick w-full mb-16" />
 
               <div className="text-center mb-12">
-                <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/70 mb-4">
-                  {ui.day} {dayIndex + 1} · {formatDateShortLocale(date, locale)}
+                <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/70 mb-1">
+                  {ui.day} {dayIndex + 1}
+                </p>
+                <p className="text-xs md:text-sm tracking-[0.3em] md:tracking-[0.5em] uppercase text-[#c9a84c]/50 mb-4">
+                  {formatDateShortLocale(date, locale)}
                 </p>
 
                 <div className="flex justify-center mb-4">
@@ -356,7 +362,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
       )}
 
       <footer className="px-6 py-12 border-t border-[#c9a84c]/10">
-        <div className="flex items-center gap-8 max-w-3xl mx-auto">
+        <div className="flex flex-col items-center gap-6 md:flex-row md:items-center md:gap-8 max-w-3xl mx-auto">
           <div className="flex gap-5 shrink-0">
           <a
             href="https://www.instagram.com/templia.art/"
@@ -381,7 +387,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
             </svg>
           </a>
           </div>
-          <p className="text-sm text-[#ededed]/35 tracking-[0.2em] text-left leading-relaxed">
+          <p className="text-sm text-[#ededed]/35 tracking-[0.2em] text-center md:text-left leading-relaxed">
             {ui.footerText.split("\n").map((line, i, arr) => (
               <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
             ))}
