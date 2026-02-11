@@ -32,6 +32,7 @@ aligned to the Tzolk'in calendar:
 ## Availability
 Preferred (agent-friendly):
 - iCal feed: https://templia.art/availability.ics
+- Airbnb iCal (direct): https://www.airbnb.com/calendar/ical/1278239214378902121.ics?s=9cc466173fe0f7cd4b33df5aa8478b65&locale=es-419
 Notes:
 - Calendar feeds can lag.
 - Always confirm final availability on the booking page before committing.
