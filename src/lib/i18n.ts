@@ -15,6 +15,13 @@ export const UI_STRINGS: Record<Locale, {
   discoverClosing: string;
   visitWebsite: string;
   footerText: string;
+  nawalExplanation: string;
+  nawalCta: string;
+  nawalSubmit: string;
+  nawalTone: string;
+  nawalElement: string;
+  nawalDirection: string;
+  defaultWelcome: string;
 }> = {
   en: {
     yourNawal: "Your Nawal",
@@ -30,6 +37,13 @@ export const UI_STRINGS: Record<Locale, {
     discoverClosing: "These projects, among others, demonstrate a unified effort in Tulum to preserve and promote Mayan heritage, providing both residents and visitors with opportunities to engage deeply with the region\u2019s cultural legacy.",
     visitWebsite: "Learn more",
     footerText: "This journey is shaped by ancestral Maya knowledge\nand conveyed through the sacred timing of the Tzolk\u2019in calendar.",
+    nawalExplanation: "In the Tzolk\u2019in, the 260-day sacred calendar of the Maya, each person is born under a unique combination of energy \u2014 a Nawal. Your Nawal reveals the qualities, strengths, and purpose woven into your life from the moment of your birth.",
+    nawalCta: "Enter your date of birth",
+    nawalSubmit: "Discover Your Nawal",
+    nawalTone: "Tone",
+    nawalElement: "Element",
+    nawalDirection: "Direction",
+    defaultWelcome: "You have arrived at Templia at a meaningful moment in your journey, {name}. It is not a coincidence. The Maya understood that every day carries its own living energy \u2014 and the days of your stay were chosen long before you were.\n\nWhat follows is a guide to the energies present during your time at Templia \u2014 a map of the influences, symbols, and intentions that accompany you while you are in the land of the Maya.",
   },
   es: {
     yourNawal: "Tu Nawal",
@@ -45,6 +59,13 @@ export const UI_STRINGS: Record<Locale, {
     discoverClosing: "Estos proyectos, entre otros, demuestran un esfuerzo unificado en Tulum por preservar y promover el patrimonio maya, brindando tanto a residentes como a visitantes oportunidades para conectar profundamente con el legado cultural de la región.",
     visitWebsite: "Conoce más",
     footerText: "Este viaje est\u00e1 moldeado por el conocimiento ancestral maya\ny transmitido a trav\u00e9s de la cadencia sagrada del calendario Tzolk\u2019in.",
+    nawalExplanation: "En el Tzolk\u2019in, el calendario sagrado de 260 d\u00edas de los mayas, cada persona nace bajo una combinaci\u00f3n \u00fanica de energ\u00eda \u2014 un Nawal. Tu Nawal revela las cualidades, fortalezas y prop\u00f3sito tejidos en tu vida desde el momento de tu nacimiento.",
+    nawalCta: "Ingresa tu fecha de nacimiento",
+    nawalSubmit: "Descubre Tu Nawal",
+    nawalTone: "Tono",
+    nawalElement: "Elemento",
+    nawalDirection: "Dirección",
+    defaultWelcome: "Has llegado a Templia en un momento significativo de tu camino, {name}. No es una coincidencia. Los mayas entend\u00edan que cada d\u00eda lleva su propia energ\u00eda viva \u2014 y los d\u00edas de tu estad\u00eda fueron elegidos mucho antes que t\u00fa.\n\nLo que sigue es una gu\u00eda de las energ\u00edas presentes durante tu tiempo en Templia \u2014 un mapa de las influencias, s\u00edmbolos e intenciones que te acompa\u00f1an mientras est\u00e1s en la tierra de los mayas.",
   },
 };
 

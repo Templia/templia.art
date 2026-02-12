@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { type GuestJourney } from "@/lib/journeys";
-import { getTzolkinDate, getGlyphPath, getDaySignByName } from "@/lib/tzolkin";
+import { getTzolkinDate, getGlyphPath, getDaySignByName, type TzolkinDate } from "@/lib/tzolkin";
 import { type Locale, UI_STRINGS, DAY_SIGN_NAMES_ES, THEMES_ES, formatDateShortLocale, formatDateShortMobileLocale } from "@/lib/i18n";
 import { LanguageToggle } from "./LanguageToggle";
 
@@ -17,14 +17,19 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
   const searchParams = useSearchParams();
   const [locale, setLocale] = useState<Locale>(() => getInitialLocale(searchParams));
 
+  const [birthdayInput, setBirthdayInput] = useState("");
+  const [computedNawal, setComputedNawal] = useState<TzolkinDate | null>(null);
+
   const ui = UI_STRINGS[locale];
   const hasEs = !!journey.es;
+  const hasBirthday = !!journey.nawal.birthday;
 
   // Resolve locale-specific content
   const nawal = locale === "es" && journey.es ? journey.es.nawal : journey.nawal;
   const days = locale === "es" && journey.es ? journey.es.days : journey.days;
   const integration = locale === "es" && journey.es ? journey.es.integration : journey.integration;
-  const welcomeMessage = locale === "es" && journey.es?.welcomeMessage ? journey.es.welcomeMessage : journey.welcomeMessage;
+  const rawWelcome = locale === "es" && journey.es?.welcomeMessage ? journey.es.welcomeMessage : journey.welcomeMessage;
+  const welcomeMessage = rawWelcome || (journey.guestName ? ui.defaultWelcome.replace(/\{name\}/g, journey.guestName) : null);
   const recommendations = locale === "es" && journey.es?.recommendations ? journey.es.recommendations : journey.recommendations;
 
   const checkInDate = new Date(journey.checkIn + "T12:00:00");
@@ -101,52 +106,54 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
         </section>
       )}
 
-      {/* ═══ YOUR NAWAL SECTION ═══ */}
-      <section className="relative px-6 py-20 max-w-3xl mx-auto">
-        <div className="text-center mb-12">
-          <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/50 mb-6">{ui.yourNawal}</p>
+      {/* ═══ YOUR NAWAL SECTION (only if birthday provided) ═══ */}
+      {hasBirthday && (
+        <section className="relative px-6 py-20 max-w-3xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/50 mb-6">{ui.yourNawal}</p>
 
-          {(() => {
-            const nawalNameRaw = journey.nawal.displayName.split("·")[0].trim().split(" ").slice(1).join(" ").replace(/\u2019/g, "'");
-            const nawalSign = getDaySignByName(nawalNameRaw);
-            if (nawalSign) return (
-              <div className="flex justify-center mb-6">
-                <img
-                  src={getGlyphPath(nawalSign)}
-                  alt={nawalSign.name}
-                  className="w-36 h-36 md:w-44 md:h-44 opacity-60"
-                  style={{ filter: "invert(78%) sepia(30%) saturate(600%) hue-rotate(5deg) brightness(90%)" }}
-                />
-              </div>
-            );
-            return null;
-          })()}
+            {(() => {
+              const nawalNameRaw = journey.nawal.displayName.split("·")[0].trim().split(" ").slice(1).join(" ").replace(/\u2019/g, "'");
+              const nawalSign = getDaySignByName(nawalNameRaw);
+              if (nawalSign) return (
+                <div className="flex justify-center mb-6">
+                  <img
+                    src={getGlyphPath(nawalSign)}
+                    alt={nawalSign.name}
+                    className="w-36 h-36 md:w-44 md:h-44 opacity-60"
+                    style={{ filter: "invert(78%) sepia(30%) saturate(600%) hue-rotate(5deg) brightness(90%)" }}
+                  />
+                </div>
+              );
+              return null;
+            })()}
 
-          <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-4">
-            {nawal.displayName}
-          </h2>
-          <p className="text-sm tracking-[0.2em] text-[#ededed]/55 mb-2">
-            {nawal.toneName}
-          </p>
-          {nawal.birthday && (
-            <p className="text-sm text-[#ededed]/45 mt-1">
-              {ui.birthday}: {nawal.birthday}
+            <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-4">
+              {nawal.displayName}
+            </h2>
+            <p className="text-sm tracking-[0.2em] text-[#ededed]/55 mb-2">
+              {nawal.toneName}
             </p>
-          )}
-        </div>
+            {nawal.birthday && (
+              <p className="text-sm text-[#ededed]/45 mt-1">
+                {ui.birthday}: {nawal.birthday}
+              </p>
+            )}
+          </div>
 
-        <div className="mayan-divider w-24 mx-auto mb-10" />
+          <div className="mayan-divider w-24 mx-auto mb-10" />
 
-        <div className="text-center mb-8">
-          <p className="font-[family-name:var(--font-cormorant)] text-2xl italic text-[#c9a84c]/70">
-            {nawal.poeticTitle}
+          <div className="text-center mb-8">
+            <p className="font-[family-name:var(--font-cormorant)] text-2xl italic text-[#c9a84c]/70">
+              {nawal.poeticTitle}
+            </p>
+          </div>
+
+          <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-[#ededed]/80 text-center max-w-2xl mx-auto">
+            {nawal.bodyText}
           </p>
-        </div>
-
-        <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-[#ededed]/80 text-center max-w-2xl mx-auto">
-          {nawal.bodyText}
-        </p>
-      </section>
+        </section>
+      )}
 
       {/* ═══ DAY-BY-DAY ITINERARY ═══ */}
       {days.map((day, dayIndex) => {
@@ -265,6 +272,104 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
           </p>
         </div>
       </section>
+
+      {/* ═══ NAWAL CTA SECTION (only if no birthday) ═══ */}
+      {!hasBirthday && (
+        <section className="relative px-6 py-20 max-w-3xl mx-auto">
+          <div className="mayan-divider-thick w-full mb-16" />
+
+          <div className="text-center mb-12">
+            <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/50 mb-6">{ui.yourNawal}</p>
+
+            {!computedNawal ? (
+              <>
+                <p className="font-[family-name:var(--font-cormorant)] text-lg md:text-xl leading-relaxed text-[#ededed]/75 max-w-2xl mx-auto mb-10">
+                  {ui.nawalExplanation}
+                </p>
+
+                <p className="text-sm tracking-[0.2em] text-[#ededed]/55 mb-6">
+                  {ui.nawalCta}
+                </p>
+
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (birthdayInput) {
+                      const date = new Date(birthdayInput + "T12:00:00");
+                      setComputedNawal(getTzolkinDate(date));
+                    }
+                  }}
+                  className="flex flex-col items-center gap-4"
+                >
+                  <input
+                    type="date"
+                    value={birthdayInput}
+                    onChange={(e) => setBirthdayInput(e.target.value)}
+                    className="bg-[#0a0a0a] border border-[#c9a84c]/30 text-[#ededed]/80 px-4 py-3 rounded-lg text-center tracking-wider focus:outline-none focus:border-[#c9a84c]/60 transition-colors w-56"
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="text-sm tracking-[0.3em] uppercase px-8 py-3 border border-[#c9a84c]/30 text-[#c9a84c]/70 rounded-full hover:bg-[#c9a84c]/10 hover:border-[#c9a84c]/50 hover:text-[#c9a84c] transition-all"
+                  >
+                    {ui.nawalSubmit}
+                  </button>
+                </form>
+              </>
+            ) : (
+              <>
+                <div className="flex justify-center mb-6">
+                  <img
+                    src={getGlyphPath(computedNawal.daySign)}
+                    alt={computedNawal.daySign.name}
+                    className="w-36 h-36 md:w-44 md:h-44 opacity-60"
+                    style={{ filter: "invert(78%) sepia(30%) saturate(600%) hue-rotate(5deg) brightness(90%)" }}
+                  />
+                </div>
+
+                <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-2">
+                  {computedNawal.displayName}
+                </h2>
+                <p className="text-lg tracking-[0.15em] uppercase text-[#ededed]/55 mb-4">
+                  {getDaySignNameLocalized(computedNawal.daySign.englishName)}
+                </p>
+
+                <div className="flex flex-wrap justify-center gap-3 mb-8">
+                  {computedNawal.daySign.themes.map((theme) => (
+                    <span
+                      key={theme}
+                      className="text-sm tracking-[0.2em] uppercase px-4 py-1.5 border border-[#c9a84c]/20 text-[#c9a84c]/60 rounded-full"
+                    >
+                      {getThemeLocalized(theme)}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mayan-divider w-24 mx-auto mb-10" />
+
+                <div className="max-w-2xl mx-auto space-y-6 text-center">
+                  <p className="text-sm tracking-[0.2em] text-[#ededed]/55">
+                    {ui.nawalTone} {computedNawal.tone.number} ({computedNawal.tone.name}) · {computedNawal.tone.meaning}
+                  </p>
+                  <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-[#ededed]/75 italic">
+                    {computedNawal.tone.description}
+                  </p>
+
+                  <div className="mayan-divider w-16 mx-auto" />
+
+                  <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-[#ededed]/80">
+                    {computedNawal.daySign.description}
+                  </p>
+
+                  <p className="text-sm tracking-[0.2em] text-[#ededed]/45">
+                    {ui.nawalElement}: {computedNawal.daySign.element} · {ui.nawalDirection}: {computedNawal.daySign.direction}
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* ═══ DISCOVER SECTION ═══ */}
       {recommendations && recommendations.length > 0 && (
