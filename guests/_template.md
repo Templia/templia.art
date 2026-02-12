@@ -1,21 +1,17 @@
 ---
 guest: Name
-birthday: Month Day, Year
+birthday:
 checkin: YYYY-MM-DD
 checkout: YYYY-MM-DD
 location: Templia Art
-subtitle: Aldea Zama
+subtitle: Tulum · Aldea Zama · Luum Zama
 ---
 
-# Welcome
+<!-- Welcome message is auto-generated using the guest name.
+     To override, add a "# Welcome" and/or "# Welcome (es)" section here. -->
 
-[Personalized welcome message in English. Use {name} to reference the guest.]
-
-# Welcome (es)
-
-[Spanish translation of welcome message.]
-
----
+<!-- If birthday is provided above, include the Nawal sections below.
+     If no birthday, omit them — the page will show an interactive Nawal calculator instead. -->
 
 # Your Nawal
 
@@ -66,6 +62,8 @@ subtitle: Aldea Zama
 [Description of the place and why it matters]
 
 - **URL**: [https://example.com]
+- **Logo**: [filename.jpg]
+- **Logo Position**: [left|right]
 
 # Recommendations (es)
 
@@ -74,6 +72,8 @@ subtitle: Aldea Zama
 [Descripción del lugar y por qué importa]
 
 - **URL**: [https://example.com]
+- **Logo**: [filename.jpg]
+- **Logo Position**: [left|right]
 
 ---
 
