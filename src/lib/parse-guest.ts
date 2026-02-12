@@ -263,7 +263,11 @@ export function parseGuestFile(filename: string): { slug: string; journey: Guest
   // Days
   const dayKeys = Object.keys(sections)
     .filter((k) => k.match(/^Day \d+/))
-    .sort();
+    .sort((a, b) => {
+      const numA = parseInt(a.match(/\d+/)?.[0] || "0");
+      const numB = parseInt(b.match(/\d+/)?.[0] || "0");
+      return numA - numB;
+    });
 
   const enDays: JourneyDay[] = [];
   const esDays: JourneyDay[] = [];
