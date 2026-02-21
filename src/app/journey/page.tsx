@@ -48,12 +48,12 @@ function JourneyRedirector() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center px-6">
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
         <div className="text-center max-w-md">
-          <h1 className="font-[family-name:var(--font-cormorant)] text-3xl text-[#c9a84c] mb-4">
+          <h1 className="font-[family-name:var(--font-cormorant)] text-3xl text-gold mb-4">
             Journey Not Found
           </h1>
-          <p className="text-[#ededed]/60 text-sm leading-relaxed">
+          <p className="text-foreground/60 text-sm leading-relaxed">
             We couldn&apos;t locate your journey. Please check the link you received or contact your host.
           </p>
         </div>
@@ -62,8 +62,8 @@ function JourneyRedirector() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-      <p className="text-[#c9a84c]/50 text-sm tracking-[0.3em] uppercase animate-pulse">
+    <div className="min-h-screen bg-background flex items-center justify-center">
+      <p className="text-gold/50 text-sm tracking-[0.3em] uppercase animate-pulse">
         Preparing your journey…
       </p>
     </div>
@@ -76,8 +76,8 @@ export default function JourneyRedirectPage() {
       <meta name="robots" content="noindex" />
       <Suspense
         fallback={
-          <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
-            <p className="text-[#c9a84c]/50 text-sm tracking-[0.3em] uppercase animate-pulse">
+          <div className="min-h-screen bg-background flex items-center justify-center">
+            <p className="text-gold/50 text-sm tracking-[0.3em] uppercase animate-pulse">
               Preparing your journey…
             </p>
           </div>
