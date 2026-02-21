@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { type GuestJourney } from "@/lib/journeys";
 import { getTzolkinDate, getGlyphPath, getDaySignByName, type TzolkinDate } from "@/lib/tzolkin";
-import { type Locale, UI_STRINGS, DAY_SIGN_NAMES_ES, THEMES_ES, formatDateShortLocale, formatDateShortMobileLocale } from "@/lib/i18n";
+import { type Locale, UI_STRINGS, DAY_SIGN_NAMES_ES, THEMES_ES, formatDateShortLocale, formatDateShortMobileLocale, formatStayRange } from "@/lib/i18n";
 import { LanguageToggle } from "./LanguageToggle";
 
 function getInitialLocale(searchParams: URLSearchParams): Locale {
@@ -34,6 +34,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
 
   const checkInDate = new Date(journey.checkIn + "T12:00:00");
   const checkOutDate = new Date(journey.checkOut + "T12:00:00");
+  const today = new Date().toISOString().split("T")[0];
 
   function getDaySignNameLocalized(englishName: string): string {
     if (locale === "es") return DAY_SIGN_NAMES_ES[englishName] || englishName;
@@ -85,11 +86,8 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
           </p>
         )}
 
-        <p className="hidden md:block text-sm tracking-[0.25em] uppercase text-[#ededed]/65 animate-fade-in-up animation-delay-800">
-          {formatDateShortLocale(checkInDate, locale)} – {formatDateShortLocale(checkOutDate, locale)}
-        </p>
-        <p className="md:hidden text-sm tracking-[0.25em] uppercase text-[#ededed]/65 animate-fade-in-up animation-delay-800">
-          {formatDateShortMobileLocale(checkInDate, locale)} – {formatDateShortMobileLocale(checkOutDate, locale)}
+        <p className="text-sm tracking-[0.25em] uppercase text-[#ededed]/65 animate-fade-in-up animation-delay-800">
+          {formatStayRange(checkInDate, checkOutDate, locale)}
         </p>
 
         <div className="mayan-divider w-32 mt-12 animate-fade-in-up animation-delay-800" />
@@ -209,19 +207,29 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                 {day.description}
               </p>
 
-              <div className="space-y-8 max-w-2xl mx-auto">
-                {day.activities.map((activity, actIndex) => (
-                  <div key={actIndex} className="relative pl-8 border-l border-[#c9a84c]/15">
-                    <div className="absolute left-0 top-1 w-2 h-2 -translate-x-[5px] rounded-full bg-[#c9a84c]/40" />
-                    <p className="text-sm tracking-[0.3em] uppercase text-[#c9a84c]/50 mb-2">
-                      {activity.timeOfDay}
-                    </p>
-                    <p className="text-[#ededed]/75 leading-relaxed">
-                      {activity.activity}
-                    </p>
-                  </div>
-                ))}
-              </div>
+              <details open={day.date === today || undefined} className="group max-w-2xl mx-auto">
+                <summary className="cursor-pointer list-none flex items-center justify-center gap-3 py-4 select-none border border-[#c9a84c]/20 rounded-full px-6 hover:border-[#c9a84c]/40 transition-colors">
+                  <svg className="w-3 h-3 text-[#c9a84c]/50 transition-transform group-open:rotate-90 shrink-0" viewBox="0 0 12 12" fill="currentColor">
+                    <path d="M4 2l4 4-4 4z" />
+                  </svg>
+                  <span className="text-sm tracking-[0.2em] uppercase text-[#c9a84c]/60">
+                    {ui.activities}
+                  </span>
+                </summary>
+                <div className="space-y-8 mt-4">
+                  {day.activities.map((activity, actIndex) => (
+                    <div key={actIndex} className="relative pl-8 border-l border-[#c9a84c]/15">
+                      <div className="absolute left-0 top-1 w-2 h-2 -translate-x-[5px] rounded-full bg-[#c9a84c]/40" />
+                      <p className="text-sm tracking-[0.3em] uppercase text-[#c9a84c]/50 mb-2">
+                        {activity.timeOfDay}
+                      </p>
+                      <p className="text-[#ededed]/75 leading-relaxed">
+                        {activity.activity}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </details>
             </div>
           </section>
         );

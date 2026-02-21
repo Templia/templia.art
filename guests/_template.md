@@ -7,6 +7,21 @@ location: Templia Art
 subtitle: Tulum · Aldea Zama · Luum Zama
 ---
 
+# Message
+
+Welcome to Templia!
+
+One of the ways we strive to make your stay truly unforgettable is by bringing the soul of this place into your experience. Templia's mission is to preserve and celebrate the essence of Mayan heritage. During your visit, we've aligned the energy of the ancient Mayan Tzolkin calendar with your dates to enhance reflection, creativity, and renewal.
+
+You can explore a special guide we've created for you for the period [DATE RANGE] here:
+
+https://templia.art/journey/[CHECKIN]-to-[CHECKOUT]/
+
+We look forward to making your time at Templia extraordinary.
+Warm regards,
+
+---
+
 <!-- Welcome message is auto-generated using the guest name.
      To override, add a "# Welcome" and/or "# Welcome (es)" section here. -->
 
