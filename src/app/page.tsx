@@ -59,13 +59,13 @@ export default function Home() {
   return (
     <>
       <HomeJsonLd />
-      <main className="min-h-screen bg-[#0a0a0a] text-[#ededed] flex flex-col items-center justify-center px-6 py-24">
+      <main className="min-h-screen bg-background text-foreground flex flex-col items-center justify-center px-6 py-24">
         <div className="mayan-divider-thick w-32 mb-12" />
 
         <h1 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-6xl font-light gold-gradient-text mb-4 text-center">
           Templia Art
         </h1>
-        <p className="font-[family-name:var(--font-cormorant)] text-xl italic text-[#c9a84c]/60 mb-12">
+        <p className="font-[family-name:var(--font-cormorant)] text-xl italic text-gold/60 mb-12">
           Tzolkin-Guided Journeys
         </p>
 
@@ -80,16 +80,16 @@ export default function Home() {
               <Link
                 key={slug}
                 href={`/journey/${slug}`}
-                className="block p-6 border border-[#c9a84c]/15 rounded-sm hover:border-[#c9a84c]/40 transition-colors group"
+                className="block p-6 border border-gold/15 rounded-sm hover:border-gold/40 transition-colors group"
               >
-                <p className="text-xs tracking-[0.3em] uppercase text-[#c9a84c]/40 mb-2">
+                <p className="text-xs tracking-[0.3em] uppercase text-gold/40 mb-2">
                   {journey.locationSubtitle}
                 </p>
-                <p className="font-[family-name:var(--font-cormorant)] text-lg text-[#ededed]/70 group-hover:text-[#ededed] transition-colors">
+                <p className="font-[family-name:var(--font-cormorant)] text-lg text-foreground/70 group-hover:text-foreground transition-colors">
                   {formatDateShort(checkIn)} – {formatDateShort(checkOut)}
                 </p>
                 {journey.guestName && (
-                  <p className="text-sm text-[#ededed]/30 mt-1">{journey.guestName}</p>
+                  <p className="text-sm text-foreground/30 mt-1">{journey.guestName}</p>
                 )}
               </Link>
             );

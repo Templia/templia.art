@@ -47,22 +47,22 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
   }
 
   return (
-    <main className="min-h-screen bg-[#0a0a0a] text-[#ededed]">
+    <main className="min-h-screen bg-background text-foreground">
       {hasEs && <LanguageToggle locale={locale} onChange={setLocale} />}
 
       {/* ═══ HERO SECTION ═══ */}
       <section className="relative min-h-[80vh] flex flex-col items-center justify-center px-6 py-24 overflow-hidden">
         <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: `radial-gradient(circle at 50% 50%, #c9a84c 1px, transparent 1px)`,
+          backgroundImage: `radial-gradient(circle at 50% 50%, var(--color-gold) 1px, transparent 1px)`,
           backgroundSize: "40px 40px",
         }} />
 
         <div className="mayan-divider-thick w-48 mb-12 animate-fade-in-up" />
 
-        <p className="text-xs md:text-sm tracking-[0.2em] md:tracking-[0.4em] uppercase text-[#c9a84c]/35 mb-4 animate-fade-in-up animation-delay-200">
+        <p className="text-xs md:text-sm tracking-[0.2em] md:tracking-[0.4em] uppercase text-gold/35 mb-4 animate-fade-in-up animation-delay-200">
           {journey.locationSubtitle}
         </p>
-        <h1 className="font-[family-name:var(--font-cormorant)] text-5xl md:text-7xl font-light tracking-wide text-center gold-gradient-text animate-fade-in-up animation-delay-400">
+        <h1 className="font-[family-name:var(--font-cormorant)] text-5xl md:text-7xl font-medium tracking-wide text-center gold-gradient-text animate-fade-in-up animation-delay-400">
           {journey.locationName}
         </h1>
 
@@ -70,23 +70,23 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
 
         {journey.guestName ? (
           <>
-            <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/50 mb-3 animate-fade-in-up animation-delay-500">
+            <p className="text-sm tracking-[0.5em] uppercase text-gold/50 mb-3 animate-fade-in-up animation-delay-500">
               {ui.preparedFor}
             </p>
-            <p className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light text-[#ededed] mb-4 animate-fade-in-up animation-delay-500">
+            <p className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light text-foreground mb-4 animate-fade-in-up animation-delay-500">
               {journey.guestName}
             </p>
-            <p className="font-[family-name:var(--font-cormorant)] text-xl md:text-2xl font-light italic text-[#c9a84c]/60 mb-6 animate-fade-in-up animation-delay-600">
+            <p className="font-[family-name:var(--font-cormorant)] text-xl md:text-2xl font-light italic text-gold/60 mb-6 animate-fade-in-up animation-delay-600">
               {ui.subtitle}
             </p>
           </>
         ) : (
-          <p className="font-[family-name:var(--font-cormorant)] text-2xl md:text-3xl font-light italic text-[#c9a84c]/80 mb-6 animate-fade-in-up animation-delay-600">
+          <p className="font-[family-name:var(--font-cormorant)] text-2xl md:text-3xl font-light italic text-gold/80 mb-6 animate-fade-in-up animation-delay-600">
             {ui.subtitle}
           </p>
         )}
 
-        <p className="text-sm tracking-[0.25em] uppercase text-[#ededed]/65 animate-fade-in-up animation-delay-800">
+        <p className="text-sm tracking-[0.25em] uppercase text-foreground/80 animate-fade-in-up animation-delay-800">
           {formatStayRange(checkInDate, checkOutDate, locale)}
         </p>
 
@@ -97,7 +97,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
       {welcomeMessage && (
         <section className="relative px-6 py-16 max-w-2xl mx-auto text-center space-y-6">
           {welcomeMessage.split("\n\n").map((paragraph, i) => (
-            <p key={i} className="font-[family-name:var(--font-cormorant)] text-xl md:text-2xl leading-relaxed text-[#ededed]/75 italic">
+            <p key={i} className="font-[family-name:var(--font-cormorant)] text-xl md:text-2xl leading-relaxed text-foreground/90 italic">
               {paragraph}
             </p>
           ))}
@@ -108,7 +108,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
       {hasBirthday && (
         <section className="relative px-6 py-20 max-w-3xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/50 mb-6">{ui.yourNawal}</p>
+            <p className="text-sm tracking-[0.5em] uppercase text-gold/50 mb-6">{ui.yourNawal}</p>
 
             {(() => {
               const nawalNameRaw = journey.nawal.displayName.split("·")[0].trim().split(" ").slice(1).join(" ").replace(/\u2019/g, "'");
@@ -129,11 +129,11 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
             <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-4">
               {nawal.displayName}
             </h2>
-            <p className="text-sm tracking-[0.2em] text-[#ededed]/55 mb-2">
+            <p className="text-sm tracking-[0.2em] text-foreground/55 mb-2">
               {nawal.toneName}
             </p>
             {nawal.birthday && (
-              <p className="text-sm text-[#ededed]/45 mt-1">
+              <p className="text-sm text-foreground/45 mt-1">
                 {ui.birthday}: {nawal.birthday}
               </p>
             )}
@@ -142,12 +142,12 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
           <div className="mayan-divider w-24 mx-auto mb-10" />
 
           <div className="text-center mb-8">
-            <p className="font-[family-name:var(--font-cormorant)] text-2xl italic text-[#c9a84c]/70">
+            <p className="font-[family-name:var(--font-cormorant)] text-2xl italic text-gold/70">
               {nawal.poeticTitle}
             </p>
           </div>
 
-          <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-[#ededed]/80 text-center max-w-2xl mx-auto">
+          <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-foreground/90 text-center max-w-2xl mx-auto">
             {nawal.bodyText}
           </p>
         </section>
@@ -164,66 +164,67 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
               <div className="mayan-divider-thick w-full mb-16" />
 
               <div className="text-center mb-12">
-                <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/70 mb-1">
+                <p className="text-2xl md:text-3xl font-bold tracking-[0.3em] uppercase text-gold/70 mb-1">
                   {ui.day} {dayIndex + 1}
                 </p>
-                <p className="text-xs md:text-sm tracking-[0.3em] md:tracking-[0.5em] uppercase text-[#c9a84c]/50 mb-4">
+                <p className="text-xs md:text-sm tracking-[0.3em] md:tracking-[0.5em] uppercase text-gold/50 mb-4">
                   {formatDateShortLocale(date, locale)}
                 </p>
 
-                <div className="flex justify-center mb-4">
+                <div className="flex items-center justify-center gap-6 md:gap-8 mb-4">
                   <img
                     src={getGlyphPath(tzolkin.daySign)}
                     alt={tzolkin.daySign.name}
-                    className="w-32 h-32 md:w-40 md:h-40 opacity-70"
+                    className="w-48 h-48 md:w-64 md:h-64 opacity-70 shrink-0"
                     style={{ filter: "invert(78%) sepia(30%) saturate(600%) hue-rotate(5deg) brightness(90%)" }}
                   />
+                  <div className="text-left">
+                    <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-1">
+                      {tzolkin.tone.number} {tzolkin.daySign.name}
+                    </h2>
+                    <p className="text-lg tracking-[0.15em] uppercase text-foreground/55">
+                      {getDaySignNameLocalized(tzolkin.daySign.englishName)}
+                    </p>
+                  </div>
                 </div>
-
-                <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-2">
-                  {tzolkin.tone.number} {tzolkin.daySign.name}
-                </h2>
-                <p className="text-lg tracking-[0.15em] uppercase text-[#ededed]/55 mb-4">
-                  {getDaySignNameLocalized(tzolkin.daySign.englishName)}
-                </p>
 
                 <div className="flex flex-wrap justify-center gap-3 mb-8">
                   {tzolkin.daySign.themes.map((theme) => (
                     <span
                       key={theme}
-                      className="text-sm tracking-[0.2em] uppercase px-4 py-1.5 border border-[#c9a84c]/20 text-[#c9a84c]/60 rounded-full"
+                      className="text-sm tracking-[0.2em] uppercase px-4 py-1.5 border border-gold/20 text-gold/60 rounded-full"
                     >
                       {getThemeLocalized(theme)}
                     </span>
                   ))}
                 </div>
 
-                <p className="font-[family-name:var(--font-cormorant)] text-2xl italic text-[#c9a84c]/70 mb-6">
+                <p className="font-[family-name:var(--font-cormorant)] text-2xl italic text-gold/70 mb-6">
                   {day.title}
                 </p>
               </div>
 
-              <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-[#ededed]/75 text-center max-w-2xl mx-auto mb-14">
+              <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-foreground/90 text-center max-w-2xl mx-auto mb-14">
                 {day.description}
               </p>
 
               <details open={day.date === today || undefined} className="group max-w-2xl mx-auto">
-                <summary className="cursor-pointer list-none flex items-center justify-center gap-3 py-4 select-none border border-[#c9a84c]/20 rounded-full px-6 hover:border-[#c9a84c]/40 transition-colors">
-                  <svg className="w-3 h-3 text-[#c9a84c]/50 transition-transform group-open:rotate-90 shrink-0" viewBox="0 0 12 12" fill="currentColor">
+                <summary className="cursor-pointer list-none flex items-center justify-center gap-3 py-4 select-none border border-gold/20 rounded-full px-6 hover:border-gold/40 transition-colors">
+                  <svg className="w-3 h-3 text-gold/50 transition-transform group-open:rotate-90 shrink-0" viewBox="0 0 12 12" fill="currentColor">
                     <path d="M4 2l4 4-4 4z" />
                   </svg>
-                  <span className="text-sm tracking-[0.2em] uppercase text-[#c9a84c]/60">
+                  <span className="text-sm tracking-[0.2em] uppercase text-gold/60">
                     {ui.activities.replace(/\{day\}/g, date.toLocaleDateString(locale === "es" ? "es-MX" : "en-US", { weekday: "long" }))}
                   </span>
                 </summary>
                 <div className="space-y-8 mt-4">
                   {day.activities.map((activity, actIndex) => (
-                    <div key={actIndex} className="relative pl-8 border-l border-[#c9a84c]/15">
-                      <div className="absolute left-0 top-1 w-2 h-2 -translate-x-[5px] rounded-full bg-[#c9a84c]/40" />
-                      <p className="text-sm tracking-[0.3em] uppercase text-[#c9a84c]/50 mb-2">
+                    <div key={actIndex} className="relative pl-8 border-l border-gold/15">
+                      <div className="absolute left-0 top-1 w-2 h-2 -translate-x-[5px] rounded-full bg-gold/40" />
+                      <p className="text-sm tracking-[0.3em] uppercase text-gold/50 mb-2">
                         {activity.timeOfDay}
                       </p>
-                      <p className="text-[#ededed]/75 leading-relaxed">
+                      <p className="text-foreground/90 leading-relaxed">
                         {activity.activity}
                       </p>
                     </div>
@@ -240,11 +241,11 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
         <div className="mayan-divider-thick w-full mb-16" />
 
         <div className="text-center mb-12">
-          <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/40 mb-6">{ui.integration}</p>
+          <p className="text-sm tracking-[0.5em] uppercase text-gold/40 mb-6">{ui.integration}</p>
           <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-4">
             {integration.title}
           </h2>
-          <p className="font-[family-name:var(--font-cormorant)] text-xl italic text-[#ededed]/55">
+          <p className="font-[family-name:var(--font-cormorant)] text-xl italic text-foreground/55">
             {integration.bodyText}
           </p>
         </div>
@@ -256,12 +257,12 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                 <p className="font-[family-name:var(--font-cormorant)] text-lg font-medium gold-gradient-text">
                   {thread.displayName}
                 </p>
-                <p className="text-sm text-[#ededed]/45 uppercase tracking-wider">
+                <p className="text-sm text-foreground/45 uppercase tracking-wider">
                   {thread.englishName}
                 </p>
               </div>
-              <div className="w-px bg-[#c9a84c]/20 shrink-0 self-stretch" />
-              <p className="text-[#ededed]/75 leading-relaxed pt-0.5">
+              <div className="w-px bg-gold/20 shrink-0 self-stretch" />
+              <p className="text-foreground/90 leading-relaxed pt-0.5">
                 {thread.summary}
               </p>
             </div>
@@ -269,13 +270,13 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
         </div>
 
         <div className="mayan-divider w-24 mx-auto mb-10" />
-        <p className="font-[family-name:var(--font-cormorant)] text-xl leading-relaxed text-[#ededed]/65 text-center italic max-w-2xl mx-auto">
+        <p className="font-[family-name:var(--font-cormorant)] text-xl leading-relaxed text-foreground/80 text-center italic max-w-2xl mx-auto">
           {integration.closingText}
         </p>
 
         <div className="text-center mt-16">
           <div className="text-2xl opacity-30 mb-4">✦ ✦ ✦</div>
-          <p className="text-sm tracking-[0.4em] uppercase text-[#c9a84c]/30">
+          <p className="text-sm tracking-[0.4em] uppercase text-gold/30">
             {journey.locationName}
           </p>
         </div>
@@ -287,15 +288,15 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
           <div className="mayan-divider-thick w-full mb-16" />
 
           <div className="text-center mb-12">
-            <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/50 mb-6">{ui.yourNawal}</p>
+            <p className="text-sm tracking-[0.5em] uppercase text-gold/50 mb-6">{ui.yourNawal}</p>
 
             {!computedNawal ? (
               <>
-                <p className="font-[family-name:var(--font-cormorant)] text-lg md:text-xl leading-relaxed text-[#ededed]/75 max-w-2xl mx-auto mb-10">
+                <p className="font-[family-name:var(--font-cormorant)] text-lg md:text-xl leading-relaxed text-foreground/90 max-w-2xl mx-auto mb-10">
                   {ui.nawalExplanation}
                 </p>
 
-                <p className="text-sm tracking-[0.2em] text-[#ededed]/55 mb-6">
+                <p className="text-sm tracking-[0.2em] text-foreground/55 mb-6">
                   {ui.nawalCta}
                 </p>
 
@@ -313,12 +314,12 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                     type="date"
                     value={birthdayInput}
                     onChange={(e) => setBirthdayInput(e.target.value)}
-                    className="bg-[#0a0a0a] border border-[#c9a84c]/30 text-[#ededed]/80 px-4 py-3 rounded-lg text-center tracking-wider focus:outline-none focus:border-[#c9a84c]/60 transition-colors w-56"
+                    className="bg-background border border-gold/30 text-foreground/90 px-4 py-3 rounded-lg text-center tracking-wider focus:outline-none focus:border-gold/60 transition-colors w-56"
                     required
                   />
                   <button
                     type="submit"
-                    className="text-sm tracking-[0.3em] uppercase px-8 py-3 border border-[#c9a84c]/30 text-[#c9a84c]/70 rounded-full hover:bg-[#c9a84c]/10 hover:border-[#c9a84c]/50 hover:text-[#c9a84c] transition-all"
+                    className="text-sm tracking-[0.3em] uppercase px-8 py-3 border border-gold/30 text-gold/70 rounded-full hover:bg-gold/10 hover:border-gold/50 hover:text-gold transition-all"
                   >
                     {ui.nawalSubmit}
                   </button>
@@ -338,7 +339,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                 <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-2">
                   {computedNawal.displayName}
                 </h2>
-                <p className="text-lg tracking-[0.15em] uppercase text-[#ededed]/55 mb-4">
+                <p className="text-lg tracking-[0.15em] uppercase text-foreground/55 mb-4">
                   {getDaySignNameLocalized(computedNawal.daySign.englishName)}
                 </p>
 
@@ -346,7 +347,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                   {computedNawal.daySign.themes.map((theme) => (
                     <span
                       key={theme}
-                      className="text-sm tracking-[0.2em] uppercase px-4 py-1.5 border border-[#c9a84c]/20 text-[#c9a84c]/60 rounded-full"
+                      className="text-sm tracking-[0.2em] uppercase px-4 py-1.5 border border-gold/20 text-gold/60 rounded-full"
                     >
                       {getThemeLocalized(theme)}
                     </span>
@@ -356,20 +357,20 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                 <div className="mayan-divider w-24 mx-auto mb-10" />
 
                 <div className="max-w-2xl mx-auto space-y-6 text-center">
-                  <p className="text-sm tracking-[0.2em] text-[#ededed]/55">
+                  <p className="text-sm tracking-[0.2em] text-foreground/55">
                     {ui.nawalTone} {computedNawal.tone.number} ({computedNawal.tone.name}) · {computedNawal.tone.meaning}
                   </p>
-                  <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-[#ededed]/75 italic">
+                  <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-foreground/90 italic">
                     {computedNawal.tone.description}
                   </p>
 
                   <div className="mayan-divider w-16 mx-auto" />
 
-                  <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-[#ededed]/80">
+                  <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-foreground/90">
                     {computedNawal.daySign.description}
                   </p>
 
-                  <p className="text-sm tracking-[0.2em] text-[#ededed]/45">
+                  <p className="text-sm tracking-[0.2em] text-foreground/45">
                     {ui.nawalElement}: {computedNawal.daySign.element} · {ui.nawalDirection}: {computedNawal.daySign.direction}
                   </p>
                 </div>
@@ -385,15 +386,15 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
           <div className="mayan-divider-thick w-full mb-12" />
 
           <div className="text-center mb-12">
-            <p className="text-sm tracking-[0.5em] uppercase text-[#c9a84c]/40 mb-6">{ui.discover}</p>
+            <p className="text-sm tracking-[0.5em] uppercase text-gold/40 mb-6">{ui.discover}</p>
           </div>
 
           <div className="max-w-2xl mx-auto mb-14 space-y-6">
-            <p className="text-[#ededed]/75 leading-relaxed">
+            <p className="text-foreground/90 leading-relaxed">
               {ui.discoverSubtitle}
             </p>
             {ui.discoverIntro && (
-              <p className="text-[#ededed]/75 leading-relaxed">
+              <p className="text-foreground/90 leading-relaxed">
                 {ui.discoverIntro}
               </p>
             )}
@@ -415,17 +416,21 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                           pos === "right"
                             ? "float-right ml-6 md:ml-8"
                             : "float-left mr-6 md:mr-8"
+                        } ${
+                          rec.logo?.includes("parque-del-jaguar")
+                            ? "logo-screen"
+                            : "logo-lighten"
                         }`}
                         style={
                           rec.logo?.includes("parque-del-jaguar")
-                            ? { filter: "invert(1)", mixBlendMode: "screen" as const }
-                            : { mixBlendMode: "lighten" as const }
+                            ? { filter: "invert(1)" }
+                            : {}
                         }
                       />
                       <h3 className="font-[family-name:var(--font-cormorant)] text-2xl md:text-3xl font-light gold-gradient-text mb-4">
                         {rec.name}
                       </h3>
-                      <p className="text-[#ededed]/75 leading-relaxed mb-3">
+                      <p className="text-foreground/90 leading-relaxed mb-3">
                         {rec.description}
                       </p>
                       {rec.url && (
@@ -433,7 +438,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                           href={rec.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-block text-sm tracking-[0.3em] uppercase text-[#c9a84c]/50 hover:text-[#c9a84c]/80 transition-colors border-b border-[#c9a84c]/20 hover:border-[#c9a84c]/50 pb-0.5"
+                          className="inline-block text-sm tracking-[0.3em] uppercase text-gold/50 hover:text-gold/80 transition-colors border-b border-gold/20 hover:border-gold/50 pb-0.5"
                         >
                           {ui.visitWebsite} →
                         </a>
@@ -444,7 +449,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                       <h3 className="font-[family-name:var(--font-cormorant)] text-2xl md:text-3xl font-light gold-gradient-text mb-4">
                         {rec.name}
                       </h3>
-                      <p className="text-[#ededed]/75 leading-relaxed mb-3">
+                      <p className="text-foreground/90 leading-relaxed mb-3">
                         {rec.description}
                       </p>
                       {rec.url && (
@@ -452,7 +457,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                           href={rec.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-block text-sm tracking-[0.3em] uppercase text-[#c9a84c]/50 hover:text-[#c9a84c]/80 transition-colors border-b border-[#c9a84c]/20 hover:border-[#c9a84c]/50 pb-0.5"
+                          className="inline-block text-sm tracking-[0.3em] uppercase text-gold/50 hover:text-gold/80 transition-colors border-b border-gold/20 hover:border-gold/50 pb-0.5"
                         >
                           {ui.visitWebsite} →
                         </a>
@@ -465,8 +470,8 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
           </div>
 
           <div className="max-w-2xl mx-auto mt-14">
-            <blockquote className="border-l-2 border-[#c9a84c]/30 pl-6">
-              <p className="font-[family-name:var(--font-cormorant)] text-lg md:text-xl italic text-[#ededed]/65 leading-relaxed">
+            <blockquote className="border-l-2 border-gold/30 pl-6">
+              <p className="font-[family-name:var(--font-cormorant)] text-lg md:text-xl italic text-foreground/80 leading-relaxed">
                 {ui.discoverClosing}
               </p>
             </blockquote>
@@ -474,14 +479,14 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
         </section>
       )}
 
-      <footer className="px-6 py-12 border-t border-[#c9a84c]/10">
-        <div className="flex items-center gap-8 max-w-3xl mx-auto">
-          <div className="flex flex-col md:flex-row gap-5 shrink-0">
+      <footer className="px-6 py-12 border-t border-gold/10">
+        <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-8 max-w-3xl mx-auto">
+          <div className="flex flex-row gap-5 shrink-0">
           <a
             href="https://www.instagram.com/templia.art/"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#ededed]/40 hover:text-[#c9a84c]/70 transition-colors"
+            className="text-foreground/40 hover:text-gold/70 transition-colors"
             aria-label="Instagram"
           >
             <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">
@@ -492,7 +497,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
             href="https://stay.templia.art"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#ededed]/40 hover:text-[#c9a84c]/70 transition-colors"
+            className="text-foreground/40 hover:text-gold/70 transition-colors"
             aria-label="Airbnb"
           >
             <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 448 512">
@@ -503,7 +508,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
             href="https://wa.me/525565429950"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#ededed]/40 hover:text-[#25D366]/70 transition-colors"
+            className="text-foreground/40 hover:text-[#25D366]/70 transition-colors"
             aria-label="WhatsApp Concierge"
           >
             <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 448 512">
@@ -511,7 +516,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
             </svg>
           </a>
           </div>
-          <p className="text-sm text-[#ededed]/35 tracking-[0.2em] text-left leading-relaxed">
+          <p className="text-sm text-foreground/35 tracking-[0.2em] text-left leading-relaxed">
             {ui.footerText.split("\n").map((line, i, arr) => (
               <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
             ))}
