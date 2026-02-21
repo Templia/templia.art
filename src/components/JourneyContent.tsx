@@ -213,7 +213,7 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                     <path d="M4 2l4 4-4 4z" />
                   </svg>
                   <span className="text-sm tracking-[0.2em] uppercase text-[#c9a84c]/60">
-                    {ui.activities}
+                    {ui.activities.replace(/\{day\}/g, date.toLocaleDateString(locale === "es" ? "es-MX" : "en-US", { weekday: "long" }))}
                   </span>
                 </summary>
                 <div className="space-y-8 mt-4">
