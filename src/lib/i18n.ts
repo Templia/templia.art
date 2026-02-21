@@ -22,6 +22,8 @@ export const UI_STRINGS: Record<Locale, {
   nawalElement: string;
   nawalDirection: string;
   defaultWelcome: string;
+  nights: string;
+  activities: string;
 }> = {
   en: {
     yourNawal: "Your Nawal",
@@ -44,6 +46,8 @@ export const UI_STRINGS: Record<Locale, {
     nawalElement: "Element",
     nawalDirection: "Direction",
     defaultWelcome: "You have arrived at Templia at a meaningful moment in your journey, {name}. It is not a coincidence. The Maya understood that every day carries its own living energy \u2014 and the days of your stay were chosen long before you were.\n\nWhat follows is a guide to the energies present during your time at Templia \u2014 a map of the influences, symbols, and intentions that accompany you while you are in the land of the Maya.",
+    nights: "nights",
+    activities: "Explore the day's activities",
   },
   es: {
     yourNawal: "Tu Nawal",
@@ -66,6 +70,8 @@ export const UI_STRINGS: Record<Locale, {
     nawalElement: "Elemento",
     nawalDirection: "Dirección",
     defaultWelcome: "Has llegado a Templia en un momento significativo de tu camino, {name}. No es una coincidencia. Los mayas entend\u00edan que cada d\u00eda lleva su propia energ\u00eda viva \u2014 y los d\u00edas de tu estad\u00eda fueron elegidos mucho antes que t\u00fa.\n\nLo que sigue es una gu\u00eda de las energ\u00edas presentes durante tu tiempo en Templia \u2014 un mapa de las influencias, s\u00edmbolos e intenciones que te acompa\u00f1an mientras est\u00e1s en la tierra de los mayas.",
+    nights: "noches",
+    activities: "Explora las actividades del día",
   },
 };
 
@@ -153,6 +159,23 @@ export const THEMES_ES: Record<string, string> = {
   "Heroism": "Heroísmo",
   "Divine Wholeness": "Plenitud Divina",
 };
+
+export function formatStayRange(checkin: Date, checkout: Date, locale: Locale): string {
+  const nights = Math.round((checkout.getTime() - checkin.getTime()) / 86400000);
+  const nightsLabel = UI_STRINGS[locale].nights;
+  const loc = locale === "es" ? "es-MX" : "en-US";
+  const monthIn = checkin.toLocaleDateString(loc, { month: "short" });
+  const dayIn = checkin.getDate();
+  const dayOut = checkout.getDate();
+
+  if (checkin.getMonth() === checkout.getMonth()) {
+    // Same month: "4 nights · Feb 21 – 25"
+    return `${nights} ${nightsLabel} · ${monthIn} ${dayIn} – ${dayOut}`;
+  }
+  // Different months: "4 nights · Jan 30 – Feb 3"
+  const monthOut = checkout.toLocaleDateString(loc, { month: "short" });
+  return `${nights} ${nightsLabel} · ${monthIn} ${dayIn} – ${monthOut} ${dayOut}`;
+}
 
 export function formatDateShortLocale(date: Date, locale: Locale): string {
   return date.toLocaleDateString(locale === "es" ? "es-MX" : "en-US", {
