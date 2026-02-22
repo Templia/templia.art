@@ -174,32 +174,33 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
                   {formatDateShortLocale(date, locale)}
                 </p>
 
-                <div className="flex items-center justify-center gap-6 md:gap-8 mb-4">
+                <div className="flex flex-col items-center md:flex-row md:items-stretch md:justify-center gap-4 md:gap-2 mb-8">
                   <img
                     src={getGlyphPath(tzolkin.daySign)}
                     alt={tzolkin.daySign.name}
-                    className="w-48 h-48 md:w-64 md:h-64 opacity-70 shrink-0"
+                    className="w-64 h-64 md:w-96 md:h-96 opacity-70 shrink-0"
                     style={{ filter: "invert(78%) sepia(30%) saturate(600%) hue-rotate(5deg) brightness(90%)" }}
                   />
-                  <div className="text-left">
-                    <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-1">
-                      {tzolkin.tone.number} {tzolkin.daySign.name}
-                    </h2>
-                    <p className="text-lg tracking-[0.15em] uppercase text-foreground/55">
-                      {getDaySignNameLocalized(tzolkin.daySign.englishName)}
-                    </p>
+                  <div className="flex flex-col items-center md:items-start md:justify-between text-center md:text-left md:py-[10%]">
+                    <div>
+                      <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-1">
+                        {tzolkin.tone.number} {tzolkin.daySign.name}
+                      </h2>
+                      <p className="text-lg tracking-[0.15em] uppercase text-foreground/55">
+                        {getDaySignNameLocalized(tzolkin.daySign.englishName)}
+                      </p>
+                    </div>
+                    <div className="flex flex-row md:flex-col gap-2 mt-4 md:mt-0">
+                      {tzolkin.daySign.themes.map((theme) => (
+                        <span
+                          key={theme}
+                          className="text-xs tracking-[0.2em] uppercase px-3 py-1 border border-gold/20 text-gold/60 rounded-full w-fit"
+                        >
+                          {getThemeLocalized(theme)}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-
-                <div className="flex flex-wrap justify-center gap-3 mb-8">
-                  {tzolkin.daySign.themes.map((theme) => (
-                    <span
-                      key={theme}
-                      className="text-sm tracking-[0.2em] uppercase px-4 py-1.5 border border-gold/20 text-gold/60 rounded-full"
-                    >
-                      {getThemeLocalized(theme)}
-                    </span>
-                  ))}
                 </div>
 
                 <p className="font-[family-name:var(--font-cormorant)] text-2xl italic text-gold/70 mb-6">
