@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getJourneyBySlug, getAllJourneySlugs } from "@/lib/journeys";
 import { formatDateShort } from "@/lib/tzolkin";
 import { JourneyContent } from "@/components/JourneyContent";
@@ -92,7 +92,7 @@ function JourneyJsonLd({ journey }: { journey: ReturnType<typeof getJourneyBySlu
 export default async function JourneyPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const journey = getJourneyBySlug(slug);
-  if (!journey) notFound();
+  if (!journey) redirect("/calendar/");
 
   return (
     <>

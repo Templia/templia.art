@@ -108,7 +108,10 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
       {hasBirthday && (
         <section className="relative px-6 py-20 max-w-3xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-sm tracking-[0.5em] uppercase text-gold/50 mb-6">{ui.yourNawal}</p>
+            <div className="mb-6">
+              <h2 className="font-[family-name:var(--font-cormorant)] text-2xl md:text-3xl tracking-[0.15em] uppercase text-gold/70">{ui.yourNawal}</h2>
+              <p className="font-[family-name:var(--font-cormorant)] text-base md:text-lg tracking-[0.15em] text-gold/50 mt-1">{ui.yourNawalAlt}</p>
+            </div>
 
             {(() => {
               const nawalNameRaw = journey.nawal.displayName.split("·")[0].trim().split(" ").slice(1).join(" ").replace(/\u2019/g, "'");
@@ -288,7 +291,10 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
           <div className="mayan-divider-thick w-full mb-16" />
 
           <div className="text-center mb-12">
-            <p className="text-sm tracking-[0.5em] uppercase text-gold/50 mb-6">{ui.yourNawal}</p>
+            <div className="mb-6">
+              <h2 className="font-[family-name:var(--font-cormorant)] text-2xl md:text-3xl tracking-[0.15em] uppercase text-gold/70">{ui.yourNawal}</h2>
+              <p className="font-[family-name:var(--font-cormorant)] text-base md:text-lg tracking-[0.15em] text-gold/50 mt-1">{ui.yourNawalAlt}</p>
+            </div>
 
             {!computedNawal ? (
               <>
