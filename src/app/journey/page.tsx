@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 
 function normalizeDate(input: string): string | null {
@@ -24,14 +24,13 @@ function normalizeDate(input: string): string | null {
 
 function JourneyRedirector() {
   const searchParams = useSearchParams();
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     const checkinRaw = searchParams.get("checkin");
     const checkoutRaw = searchParams.get("checkout");
 
     if (!checkinRaw || !checkoutRaw) {
-      setError(true);
+      window.location.replace("/calendar/");
       return;
     }
 
@@ -39,27 +38,12 @@ function JourneyRedirector() {
     const checkout = normalizeDate(checkoutRaw);
 
     if (!checkin || !checkout) {
-      setError(true);
+      window.location.replace("/calendar/");
       return;
     }
 
     window.location.replace(`/journey/${checkin}-to-${checkout}/`);
   }, [searchParams]);
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-6">
-        <div className="text-center max-w-md">
-          <h1 className="font-[family-name:var(--font-cormorant)] text-3xl text-gold mb-4">
-            Journey Not Found
-          </h1>
-          <p className="text-foreground/60 text-sm leading-relaxed">
-            We couldn&apos;t locate your journey. Please check the link you received or contact your host.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">

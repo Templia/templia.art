@@ -3,6 +3,7 @@ export type Locale = "en" | "es";
 // UI labels that don't come from journey data
 export const UI_STRINGS: Record<Locale, {
   yourNawal: string;
+  yourNawalAlt: string;
   birthday: string;
   day: string;
   the: string;
@@ -27,6 +28,7 @@ export const UI_STRINGS: Record<Locale, {
 }> = {
   en: {
     yourNawal: "Your Nawal",
+    yourNawalAlt: "( Nagual · Nahual )",
     birthday: "Birthday",
     day: "Day",
     the: "The",
@@ -51,6 +53,7 @@ export const UI_STRINGS: Record<Locale, {
   },
   es: {
     yourNawal: "Tu Nawal",
+    yourNawalAlt: "( Nagual · Nahual )",
     birthday: "Cumpleaños",
     day: "Día",
     the: "El/La",
