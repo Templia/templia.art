@@ -20,6 +20,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout guest data
+        uses: actions/checkout@v4
+        with:
+          repository: templia/guests
+          token: ${{ secrets.GUESTS_REPO_TOKEN }}
+          path: guests
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
