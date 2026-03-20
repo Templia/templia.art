@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
 
+Sitemap: https://templia.art/sitemap.xml
+
 LLMS: /llms.txt
 LLMS: /.well-known/llms.txt
