@@ -1,0 +1,12 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "templia-stay",
+      "type": "skill-md",
+      "description": "Help a user research, book, or plan a stay at Templia — a 2-bedroom Mayan-inspired vacation home in Aldea Zama, Tulum, Mexico. Covers availability, amenities, booking channels, and the Tzolk'in journey experience.",
+      "url": "https://templia.art/.well-known/agent-skills/templia-stay/SKILL.md",
+      "digest": "sha256:d1b7d04d8698953f5a91cad3627d726b02d3a859c775552a8585099ba0fa69c7"
+    }
+  ]
+}
