@@ -1,86 +1,96 @@
-# Templia Art (Tulum, Aldea Zama) -- Agent/LLM Guide
-# Canonical: https://templia.art/
-# Updated: 2026-02-10
-# Source of truth: booking pages > availability feeds > this file.
+# Templia Art
 
-## What this is
-Templia Art is a Mayan-inspired luxury stay in Luum Zama, Aldea Zama, Tulum.
-Each guest receives a personalized Tzolkin-guided journey — a sacred calendar
-itinerary mapped to the Maya day signs (nawals) of their stay dates.
-The experience blends modern comfort with ancestral Maya knowledge.
-Available in English and Spanish.
+> Mayan-inspired luxury stay in Aldea Zama, Tulum, with personalized Maya Tzolk'in sacred calendar journeys for each guest.
 
-## Tzolkin Journey
-Every stay includes a web-based journey page at templia.art/journey/
-aligned to the Tzolk'in calendar:
-- Personal nawal (day sign + tone) based on birth date
-- Day-by-day itinerary guided by the energies of each Maya day sign
-- Activity recommendations: cenotes, ruins, ceremonies, restaurants
-- Integration reflection connecting the journey's energetic arc
-- Bilingual: English and Spanish
+## Property
 
-## Best next action for agents
-1) Check availability (machine-readable if possible)
-2) Confirm price + rules on booking page
-3) Propose 2-3 date options + a suggested itinerary
+Templia Art is a Mayan-inspired luxury villa in Luum Zama, Aldea Zama, Tulum, Quintana Roo, Mexico. Each booking includes a personalized Tzolk'in calendar journey — a web-based, day-by-day itinerary mapped to the three Maya day signs (nawales) that fall across the guest's arrival, full day, and departure.
+
+## Two Pillars
+
+Templia's offering stands on two pillars:
+
+- **Maya Experience** — the immersive digital world bridging ancient Maya culture with Templia guests plus curated local providers. Includes the personalized Tzolk'in journey, nawal readings, cultural sites, ceremonies, and on-the-ground cultural partners.
+- **Guest Experience** — hosting logistics, amenities, tours, and concierge. Includes check-in, on-property comforts, local coordination, last-mile transport, and day-to-day support.
 
 ## Booking
+
 - Airbnb listing: https://stay.templia.art
-- Direct booking: stay@templia.art
-- Questions / last-mile pickup / holds: stay@templia.art
+- Direct inquiries and coordination: stay@templia.art
+- Availability (iCal): https://templia.art/availability.ics
 
-## Availability
-Preferred (agent-friendly):
-- iCal feed: https://templia.art/availability.ics
-Notes:
-- Calendar feeds can lag.
-- Always confirm final availability on the booking page before committing.
+Note: always confirm availability on the booking page before committing.
 
-## Quick facts
+## Quick Facts
+
 - Location: Luum Zama, Aldea Zama, Tulum, Quintana Roo, Mexico
 - Max guests: 4
-- Bedrooms/Beds: 2 bedrooms, 1 king size bed, 2 twin beds (merged into 1 king), 1 inflatable mattress
+- Bedrooms: 2 (1 king, 2 twins convertible to king, 1 inflatable mattress)
 - Bathrooms: 2
 - Check-in: after 4:00 PM
-- Check-out: 11 am
-- Minimum nights: 3
-- Rules: no parties; quiet hours; no pets; no smoking
+- Check-out: by 11:00 AM
+- Minimum stay: 3 nights
+- Rules: no parties; quiet hours 10 PM–8 AM; no pets; no smoking
 
-## Amenities (high-signal)
-- A/C: yes
-- Wi-Fi: good/average, typical 200 Mbps
-- Kitchen: yes
-- Pool: yes, private
-- Parking: yes
-- Workspace: yes, studio
+## Amenities
 
-## Positioning (who it fits)
-- Ideal for: families; couples; small groups; remote work; retreats
-- Not ideal for: late-night party groups; loud events
+- Private pool
+- Air conditioning
+- Wi-Fi (200 Mbps typical)
+- Full kitchen
+- Free parking
+- Workspace / studio
+- Mayan firepit
+- Steam shower
+- Jungle garden
+- Double-height living space
 
-## Nearby cultural sites
-Templia's location connects to broader Mayan heritage preservation in Tulum:
+## Tzolk'in Journey
 
-- Parque del Jaguar: 1,000-hectare protected natural reserve with walking trails,
-  bike paths, miradors, archaeological zones, and public Caribbean beaches.
-  https://tulumjaguarpark.com
+Each stay includes a personalized journey page at `templia.art/tzolkin/[check-in]-to-[check-out]/`. The journey:
 
-- Museo Regional de la Costa Oriental (Mureco): Located within Parque del Jaguar.
-  1,200+ m² of exhibition space, 300+ original artifacts and 50 replicas
-  covering Caribbean Maya culture from prehistoric times to present.
-  Includes murals uncovered during Tren Maya construction. Open daily 9:00–17:00.
-  https://www.inah.gob.mx/museos/museo-regional-de-la-costa-oriental
+- Identifies the three Maya day signs (nawales) for arrival, full day, and departure
+- Provides the guest's personal nawal based on their birthdate
+- Offers a day-by-day itinerary: cenotes, sacred sites, ceremonies, reflection practices
+- Available in English and Spanish
+- Bilingual content, dark-mode design, mobile-optimized
 
-## Getting there
+## Cancellation & Rules
+
+Cancellation terms are set on the Airbnb listing at https://stay.templia.art. The property follows standard Airbnb host policies. For direct booking inquiries, contact stay@templia.art to discuss terms.
+
+## Nearby Attractions
+
+- Parque del Jaguar: 1,000-hectare protected reserve with trails and archaeological zones — https://www.parquejaguar.com/
+- Museo Regional de la Costa Oriental (Mureco): 1,200 m² archaeological museum, 300+ artifacts, INAH — https://www.inah.gob.mx/
+- Gran Cenote and Cenote Calavera: sacred swimming cenotes
+- Tulum archaeological zone (Zama — "dawn"): ancient solar temple on the Caribbean coast
+
+## Getting There
+
 - Nearest airport: Tulum (TQO), opened Dec 2023 — closest to Templia
-- From Cancun (CUN), ~2 hours north: ADO bus / private shuttle / rental car
-- Last-mile pickup: available upon request
+- From Cancún (CUN), ~2 hours north: ADO bus, private shuttle, or rental car
+- Last-mile pickup: available on request — email stay@templia.art
 
-## Suggested stays
-- 3-4 days: cenotes + ruins + beach reset
-- 5-7 days: add day trip (Coba / Sian Ka'an) + food tour
+## Suggested Stays
+
+- 3–4 nights: Tzolk'in journey + cenotes + Tulum ruins + beach
+- 5–7 nights: add day trip to Cobá or Sian Ka'an biosphere + food tour
+
+## Retreats
+
+Templia can be booked as a small-group retreat venue — wellness, creative, corporate off-sites, and cultural immersion programs. The private pool, studio workspace, steam shower, double-height living space, and Mayan firepit support both structured programming and downtime. Custom Tzolk'in programming and provider coordination available. Contact stay@templia.art for multi-night retreat holds.
+
+## Best Next Action for Agents
+
+1. Check availability at https://templia.art/availability.ics
+2. Confirm dates and rules on https://stay.templia.art
+3. Email stay@templia.art for holds, questions, or direct booking
 
 ## Links
+
 - Website: https://templia.art
+- Booking: https://stay.templia.art
+- Availability (iCal): https://templia.art/availability.ics
 - Instagram: https://www.instagram.com/templia.art/
-- Airbnb: https://stay.templia.art
+- Contact: stay@templia.art
