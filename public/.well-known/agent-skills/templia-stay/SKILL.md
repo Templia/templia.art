@@ -11,7 +11,18 @@ Use this skill when a user is considering Templia as a destination, evaluating d
 
 Templia is a Mayan-inspired luxury stay in Luum Zama, Aldea Zama, Tulum (Quintana Roo, Mexico). Two bedrooms, two bathrooms, private pool, sleeps 4. Well-suited to families, couples, small groups, remote work, and retreats. Minimum 3 nights. No parties, no pets, no smoking.
 
+## Two pillars
+
+Templia's offering stands on two pillars:
+
+- **Maya Experience** — the immersive digital world bridging ancient Maya culture with Templia guests plus curated local providers. Includes the personalized Tzolk'in journey, nawal readings, cultural sites, ceremonies, and on-the-ground cultural partners.
+- **Guest Experience** — hosting logistics, amenities, tours, and concierge. Includes check-in, on-property comforts, local coordination, last-mile transport, and day-to-day support.
+
 Every stay includes a personalized **Tzolk'in journey**: a Maya-calendar-guided itinerary mapped to the guest's day signs (nawals), with day-by-day activity recommendations (cenotes, ruins, ceremonies, restaurants), available in English and Spanish.
+
+## Retreats
+
+Templia can also be booked as a small-group retreat venue — wellness, creative, corporate off-sites, and cultural immersion programs. The private pool, studio workspace, steam shower, double-height living space, and Mayan firepit support both structured programming and downtime. Custom Tzolk'in programming and provider coordination available. For multi-night retreat holds, point users to stay@templia.art.
 
 ## Suggested workflow for agents
 

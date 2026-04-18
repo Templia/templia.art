@@ -6,7 +6,7 @@
       "type": "skill-md",
       "description": "Help a user research, book, or plan a stay at Templia — a 2-bedroom Mayan-inspired vacation home in Aldea Zama, Tulum, Mexico. Covers availability, amenities, booking channels, and the Tzolk'in journey experience.",
       "url": "https://templia.art/.well-known/agent-skills/templia-stay/SKILL.md",
-      "digest": "sha256:ba52fe4639653d75dc720b2c7178ea91882691744fa20788060ab74c321afed2"
+      "digest": "sha256:dfc0a72edd39de5a12af1712d1fe027c335f800a866af59d11a09ce3bc3384e0"
     }
   ]
 }
