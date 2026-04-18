@@ -1,0 +1,7 @@
+1:"$Sreact.fragment"
+2:I[22530,["/_next/static/chunks/7079ca09974ff837.js"],"ThemeToggle"]
+3:I[39756,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/d2be314c3ece3fbe.js"],"default"]
+4:I[37457,["/_next/static/chunks/ff1a16fafef87110.js","/_next/static/chunks/d2be314c3ece3fbe.js"],"default"]
+5:I[29306,["/_next/static/chunks/7079ca09974ff837.js","/_next/static/chunks/ee9a32cf640d9173.js"],"default"]
+:HL["/_next/static/chunks/dece9ed72048b8aa.css","style"]
+0:{"buildId":"llS4YCZI_uCvoRVxP2xv6","rsc":["$","$1","c",{"children":[[["$","link","0",{"rel":"stylesheet","href":"/_next/static/chunks/dece9ed72048b8aa.css","precedence":"next"}],["$","script","script-0",{"src":"/_next/static/chunks/7079ca09974ff837.js","async":true}]],["$","html",null,{"lang":"en","suppressHydrationWarning":true,"children":["$","body",null,{"className":"inter_c90aabcd-module__Q2KVYa__variable cormorant_garamond_ec0b03bc-module__6ZvGZG__variable antialiased","children":[["$","script",null,{"dangerouslySetInnerHTML":{"__html":"try{if(localStorage.getItem(\"theme\")===\"light\")document.documentElement.classList.add(\"light\")}catch(e){}"}}],["$","$L2",null,{}],["$","$L3",null,{"parallelRouterKey":"children","template":["$","$L4",null,{}],"notFound":[["$","$L5",null,{}],[]]}]]}]}]]}],"loading":null,"isPartial":false}
