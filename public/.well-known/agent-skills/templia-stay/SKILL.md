@@ -26,7 +26,7 @@ Every stay includes a personalized **Tzolk'in journey**: a Maya-calendar-guided 
 - **Check-in / out:** after 4:00 PM / by 11:00 AM
 - **Minimum stay:** 3 nights
 - **Amenities:** A/C, Wi-Fi (~200 Mbps), full kitchen, private pool, parking, studio workspace
-- **Nearest airport:** Cancun (CUN). Options: ADO bus, private shuttle, or rental car. Last-mile pickup available on request.
+- **Nearest airport:** Tulum (TQO) — closest, opened Dec 2023. Cancun (CUN) is a larger alternative ~2 hours north, with more international flight options. From either: ADO bus, private shuttle, or rental car. Last-mile pickup available on request.
 
 ## Primary links
 
