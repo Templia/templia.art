@@ -1,0 +1,464 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Templia Art API",
+    "summary": "Agent-friendly API for booking and planning a Mayan-inspired stay in Aldea Zama, Tulum.",
+    "description": "The Templia Art API exposes canonical property facts, live availability, and (coming soon) personalized Tzolk'in journey suggestions. All endpoints are JSON, CORS-enabled, and cacheable. Live nightly rates and booking actions are not exposed here — rates are managed on Airbnb (https://stay.templia.art) and direct bookings go to stay@templia.art.\n\nComplementary non-API resources:\n- https://templia.art/llms.txt — agent/LLM guide\n- https://templia.art/.well-known/agent-skills/index.json — agent skills discovery\n- https://templia.art/availability.ics — iCal feed (text/calendar), same data as /api/availability",
+    "version": "1.0.0",
+    "termsOfService": "https://templia.art/",
+    "contact": {
+      "name": "Templia Art",
+      "email": "stay@templia.art",
+      "url": "https://templia.art"
+    },
+    "x-updated": "2026-04-19"
+  },
+  "servers": [
+    {
+      "url": "https://templia.art",
+      "description": "Production"
+    }
+  ],
+  "externalDocs": {
+    "description": "Agent/LLM guide for Templia Art",
+    "url": "https://templia.art/llms.txt"
+  },
+  "tags": [
+    {
+      "name": "property",
+      "description": "Canonical facts about the property — amenities, capacity, rules, location."
+    },
+    {
+      "name": "availability",
+      "description": "Live booking availability derived from the Airbnb-synced calendar."
+    }
+  ],
+  "paths": {
+    "/api/property.json": {
+      "get": {
+        "tags": ["property"],
+        "operationId": "getProperty",
+        "summary": "Canonical property facts",
+        "description": "Returns a schema.org LodgingBusiness document augmented with practical fields agents need: capacity, amenities, rules, airports, pricing tier (not nightly rates), suggested stays, nearby sites, and cross-links to the booking URL and availability feed. Static JSON; safe to cache.",
+        "responses": {
+          "200": {
+            "description": "Property document.",
+            "headers": {
+              "Cache-Control": {
+                "schema": { "type": "string" },
+                "example": "public, max-age=600"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Property" },
+                "examples": {
+                  "snapshot": {
+                    "$ref": "#/components/examples/PropertySnapshot"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/availability": {
+      "get": {
+        "tags": ["availability"],
+        "operationId": "getAvailability",
+        "summary": "Availability window",
+        "description": "Returns whether a requested date window is bookable, plus any blocked ranges that intersect the window. Source: Airbnb-synced iCal. The default window is today → today+30 when `from` and `to` are omitted. `to` is exclusive (check-out date).\n\nCalendar feeds can lag. Agents should always confirm final availability on the booking page before committing a guest.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Check-in date (inclusive). ISO 8601 `YYYY-MM-DD`. Defaults to today.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "example": "2026-06-01"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Check-out date (exclusive). ISO 8601 `YYYY-MM-DD`. Must be after `from`. Max window 365 days. Defaults to today+30.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "example": "2026-06-05"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Availability window (including when `available` is false).",
+            "headers": {
+              "Cache-Control": {
+                "schema": { "type": "string" },
+                "example": "public, max-age=300"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Availability" },
+                "examples": {
+                  "open": {
+                    "summary": "Fully open window",
+                    "value": {
+                      "from": "2026-06-01",
+                      "to": "2026-06-05",
+                      "nights": 4,
+                      "available": true,
+                      "reason": null,
+                      "minNights": 3,
+                      "meetsMinNights": true,
+                      "blockedRanges": [],
+                      "bookingUrl": "https://stay.templia.art",
+                      "source": {
+                        "url": "https://templia.art/availability.ics",
+                        "fetchedAt": "2026-04-19T23:10:27.274Z"
+                      },
+                      "disclaimer": "Calendar feeds can lag. Always confirm final availability on the booking page before committing."
+                    }
+                  },
+                  "partiallyBlocked": {
+                    "summary": "Window overlaps a booked range",
+                    "value": {
+                      "from": "2026-04-19",
+                      "to": "2026-05-19",
+                      "nights": 30,
+                      "available": false,
+                      "reason": "9 of 30 night(s) are blocked",
+                      "minNights": 3,
+                      "meetsMinNights": true,
+                      "blockedRanges": [
+                        {
+                          "start": "2026-04-24",
+                          "end": "2026-04-27",
+                          "nights": 3,
+                          "summary": "Reserved"
+                        },
+                        {
+                          "start": "2026-04-27",
+                          "end": "2026-05-03",
+                          "nights": 6,
+                          "summary": "Airbnb (Not available)"
+                        }
+                      ],
+                      "bookingUrl": "https://stay.templia.art",
+                      "source": {
+                        "url": "https://templia.art/availability.ics",
+                        "fetchedAt": "2026-04-19T23:10:27.274Z"
+                      },
+                      "disclaimer": "Calendar feeds can lag. Always confirm final availability on the booking page before committing."
+                    }
+                  },
+                  "tooShort": {
+                    "summary": "Below minimum nights",
+                    "value": {
+                      "from": "2026-06-01",
+                      "to": "2026-06-03",
+                      "nights": 2,
+                      "available": false,
+                      "reason": "window is 2 night(s); minimum is 3",
+                      "minNights": 3,
+                      "meetsMinNights": false,
+                      "blockedRanges": [],
+                      "bookingUrl": "https://stay.templia.art",
+                      "source": {
+                        "url": "https://templia.art/availability.ics",
+                        "fetchedAt": "2026-04-19T23:10:27.274Z"
+                      },
+                      "disclaimer": "Calendar feeds can lag. Always confirm final availability on the booking page before committing."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": {
+                  "error": {
+                    "code": "invalid_from",
+                    "message": "`from` must be YYYY-MM-DD."
+                  }
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Upstream calendar feed unavailable (transient).",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Property": {
+        "type": "object",
+        "description": "Hybrid of schema.org LodgingBusiness + practical fields. The @-prefixed fields are schema.org linked-data conventions; the rest is plain JSON. See https://templia.art/api/property.json for the full canonical document.",
+        "required": ["name", "url", "capacity", "rules", "location", "links"],
+        "properties": {
+          "@context": { "type": "string", "example": "https://schema.org" },
+          "@type": { "type": "string", "example": "LodgingBusiness" },
+          "@id": { "type": "string", "format": "uri" },
+          "version": { "type": "string" },
+          "lastModified": { "type": "string", "format": "date" },
+          "name": { "type": "string" },
+          "alternateName": { "type": "array", "items": { "type": "string" } },
+          "tagline": { "type": "string" },
+          "description": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "inLanguage": { "type": "array", "items": { "type": "string" } },
+          "contact": {
+            "type": "object",
+            "properties": {
+              "email": { "type": "string", "format": "email" },
+              "instagram": { "type": "string", "format": "uri" },
+              "preferredChannel": { "type": "string" },
+              "responseTime": { "type": "string" },
+              "languages": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "location": {
+            "type": "object",
+            "properties": {
+              "address": { "type": "object" },
+              "neighborhood": { "type": "object" },
+              "geo": {
+                "type": "object",
+                "properties": {
+                  "latitude": { "type": "number" },
+                  "longitude": { "type": "number" }
+                }
+              },
+              "timezone": { "type": "string", "example": "America/Cancun" },
+              "utcOffset": { "type": "string", "example": "-05:00" }
+            }
+          },
+          "capacity": {
+            "type": "object",
+            "properties": {
+              "maxGuests": { "type": "integer", "example": 4 },
+              "bedrooms": { "type": "integer", "example": 2 },
+              "bathrooms": { "type": "integer", "example": 2 },
+              "beds": { "type": "array", "items": { "type": "object" } }
+            }
+          },
+          "amenities": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "category": { "type": "string" },
+                "value": { "type": "boolean" },
+                "detail": { "type": "string" }
+              }
+            }
+          },
+          "rules": {
+            "type": "object",
+            "properties": {
+              "minNights": { "type": "integer", "example": 3 },
+              "checkInTime": { "type": "string", "example": "16:00" },
+              "checkOutTime": { "type": "string", "example": "11:00" },
+              "petsAllowed": { "type": "boolean" },
+              "smokingAllowed": { "type": "boolean" },
+              "partiesAllowed": { "type": "boolean" },
+              "quietHours": { "type": "boolean" }
+            }
+          },
+          "pricing": {
+            "type": "object",
+            "description": "Intentionally does NOT include nightly rates. Live rates are managed on Airbnb — see `rateSource` / `bookingUrl`.",
+            "properties": {
+              "currency": { "type": "string" },
+              "tier": { "type": "string", "example": "$$" },
+              "publishedRates": { "type": "boolean", "example": false },
+              "rateSource": { "type": "string", "format": "uri" },
+              "bookingUrl": { "type": "string", "format": "uri" },
+              "directBookingEmail": { "type": "string", "format": "email" }
+            }
+          },
+          "links": { "type": "object", "additionalProperties": { "type": "string" } },
+          "pillars": { "type": "object" },
+          "tzolkinJourney": { "type": "object" },
+          "suggestedStays": { "type": "array", "items": { "type": "object" } },
+          "retreats": { "type": "object" },
+          "airports": { "type": "array", "items": { "type": "object" } },
+          "nearby": { "type": "array", "items": { "type": "object" } },
+          "rating": {
+            "type": "object",
+            "properties": {
+              "source": { "type": "string" },
+              "ratingValue": { "type": "number" },
+              "reviewCount": { "type": "integer" }
+            }
+          },
+          "sourceOfTruth": { "type": "object" }
+        }
+      },
+      "Availability": {
+        "type": "object",
+        "required": ["from", "to", "nights", "available", "minNights", "blockedRanges", "bookingUrl", "source"],
+        "properties": {
+          "from": {
+            "type": "string",
+            "format": "date",
+            "description": "Check-in date echoed back from the request (or default)."
+          },
+          "to": {
+            "type": "string",
+            "format": "date",
+            "description": "Check-out date echoed back from the request (or default). Exclusive."
+          },
+          "nights": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Number of nights in the window (`to - from`)."
+          },
+          "available": {
+            "type": "boolean",
+            "description": "`true` only if every night in the window is unblocked AND the window meets the minimum-nights rule."
+          },
+          "reason": {
+            "type": ["string", "null"],
+            "description": "Human-readable reason when `available` is false. `null` when available."
+          },
+          "minNights": {
+            "type": "integer",
+            "example": 3,
+            "description": "Property-wide minimum stay."
+          },
+          "meetsMinNights": {
+            "type": "boolean"
+          },
+          "blockedRanges": {
+            "type": "array",
+            "description": "Blocked ranges clipped to the requested window. `end` is exclusive (iCal convention).",
+            "items": {
+              "type": "object",
+              "required": ["start", "end", "nights"],
+              "properties": {
+                "start": { "type": "string", "format": "date" },
+                "end": { "type": "string", "format": "date" },
+                "nights": { "type": "integer" },
+                "summary": {
+                  "type": ["string", "null"],
+                  "description": "Free-text label from the source calendar, if any (e.g. \"Reserved\", \"Airbnb (Not available)\")."
+                }
+              }
+            }
+          },
+          "bookingUrl": {
+            "type": "string",
+            "format": "uri"
+          },
+          "source": {
+            "type": "object",
+            "required": ["url", "fetchedAt"],
+            "properties": {
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "description": "Canonical public iCal feed. Agents should point consumers here for raw data."
+              },
+              "fetchedAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          },
+          "disclaimer": {
+            "type": "string"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["error"],
+        "properties": {
+          "error": {
+            "type": "object",
+            "required": ["code", "message"],
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "invalid_from",
+                  "invalid_to",
+                  "invalid_range",
+                  "window_too_large",
+                  "method_not_allowed",
+                  "upstream_unavailable",
+                  "upstream_fetch_failed"
+                ]
+              },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "examples": {
+      "PropertySnapshot": {
+        "summary": "Abbreviated snapshot — see /api/property.json for the full document.",
+        "value": {
+          "@type": "LodgingBusiness",
+          "name": "Templia Art",
+          "alternateName": ["Templia Tulum"],
+          "url": "https://templia.art",
+          "location": {
+            "neighborhood": {
+              "name": "Aldea Zama",
+              "alternateName": "Luum Zama"
+            },
+            "geo": { "latitude": 20.2114, "longitude": -87.4654 },
+            "timezone": "America/Cancun"
+          },
+          "capacity": {
+            "maxGuests": 4,
+            "bedrooms": 2,
+            "bathrooms": 2
+          },
+          "rules": {
+            "minNights": 3,
+            "checkInTime": "16:00",
+            "checkOutTime": "11:00",
+            "petsAllowed": false,
+            "smokingAllowed": false
+          },
+          "pricing": {
+            "tier": "$$",
+            "publishedRates": false,
+            "bookingUrl": "https://stay.templia.art"
+          },
+          "links": {
+            "booking": "https://stay.templia.art",
+            "availabilityJson": "https://templia.art/api/availability",
+            "availabilityIcs": "https://templia.art/availability.ics",
+            "llmsTxt": "https://templia.art/llms.txt",
+            "openapi": "https://templia.art/.well-known/openapi.json"
+          }
+        }
+      }
+    }
+  }
+}
