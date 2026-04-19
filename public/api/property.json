@@ -1,0 +1,244 @@
+{
+  "$schema": "https://schema.org/LodgingBusiness",
+  "@context": "https://schema.org",
+  "@type": "LodgingBusiness",
+  "@id": "https://templia.art/#lodging",
+  "version": "1.0.0",
+  "lastModified": "2026-04-19",
+  "canonical": "https://templia.art/api/property.json",
+
+  "name": "Templia Art",
+  "alternateName": ["Templia Tulum", "Templia"],
+  "tagline": "A Mayan-inspired luxury stay in Aldea Zama, Tulum",
+  "description": "A Mayan-inspired luxury stay in Aldea Zama, Tulum. Blends modern comfort with Maya Tzolk'in calendar-guided cultural storytelling. Private pool, jungle garden, Mayan firepit, and steam shower. Each stay includes a personalized Tzolk'in journey aligned to the Maya day signs (nawales) of the guest's dates. Ideal for couples, families, small groups, retreats, and remote work.",
+  "url": "https://templia.art",
+  "inLanguage": ["en", "es"],
+
+  "contact": {
+    "email": "stay@templia.art",
+    "instagram": "https://www.instagram.com/templia.art/",
+    "preferredChannel": "email",
+    "responseTime": "within 24 hours",
+    "languages": ["en", "es"]
+  },
+
+  "location": {
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Tulum",
+      "addressRegion": "Quintana Roo",
+      "postalCode": "77760",
+      "addressCountry": "MX"
+    },
+    "neighborhood": {
+      "name": "Aldea Zama",
+      "alternateName": "Luum Zama",
+      "description": "Upscale planned neighborhood between Tulum town center and the Tulum archaeological zone."
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 20.2114,
+      "longitude": -87.4654
+    },
+    "timezone": "America/Cancun",
+    "utcOffset": "-05:00"
+  },
+
+  "capacity": {
+    "maxGuests": 4,
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "beds": [
+      { "type": "king", "count": 1, "note": "Master bedroom" },
+      { "type": "king", "count": 1, "note": "Second bedroom — 2 twins joined into 1 king" },
+      { "type": "inflatable", "count": 1, "note": "Extra mattress available" }
+    ]
+  },
+
+  "amenities": [
+    { "name": "Private Pool", "category": "outdoor", "value": true },
+    { "name": "Air Conditioning", "category": "comfort", "value": true },
+    { "name": "Wi-Fi", "category": "connectivity", "value": true, "detail": "approximately 200 Mbps" },
+    { "name": "Full Kitchen", "category": "kitchen", "value": true },
+    { "name": "Free Parking", "category": "logistics", "value": true },
+    { "name": "Workspace / Studio", "category": "work", "value": true },
+    { "name": "Mayan Firepit", "category": "outdoor", "value": true },
+    { "name": "Steam Shower", "category": "wellness", "value": true },
+    { "name": "Jungle Garden", "category": "outdoor", "value": true }
+  ],
+
+  "rules": {
+    "minNights": 3,
+    "checkInTime": "16:00",
+    "checkOutTime": "11:00",
+    "petsAllowed": false,
+    "smokingAllowed": false,
+    "partiesAllowed": false,
+    "quietHours": true,
+    "notIdealFor": ["late-night party groups", "loud events"]
+  },
+
+  "pricing": {
+    "currency": "USD",
+    "tier": "$$",
+    "tierNote": "Mid-to-upper range for Aldea Zama luxury rentals.",
+    "publishedRates": false,
+    "rateSource": "https://stay.templia.art",
+    "rateNote": "Live nightly rates, fees, and discounts are managed on Airbnb. Quote nothing as authoritative without checking the booking page.",
+    "bookingUrl": "https://stay.templia.art",
+    "directBookingEmail": "stay@templia.art"
+  },
+
+  "media": {
+    "logo": "https://templia.art/assets/images/logo.svg",
+    "heroImage": "https://templia.art/assets/images/image00015.jpg",
+    "ogImage": "https://templia.art/og-image.jpg",
+    "gallery": "https://stay.templia.art"
+  },
+
+  "links": {
+    "website": "https://templia.art",
+    "booking": "https://stay.templia.art",
+    "availabilityIcs": "https://templia.art/availability.ics",
+    "availabilityJson": "https://templia.art/api/availability",
+    "instagram": "https://www.instagram.com/templia.art/",
+    "llmsTxt": "https://templia.art/llms.txt",
+    "agentSkills": "https://templia.art/.well-known/agent-skills/index.json",
+    "openapi": "https://templia.art/.well-known/openapi.json",
+    "tzolkinJourney": "https://templia.art/api/tzolkin/journey",
+    "sitemap": "https://templia.art/sitemap.xml"
+  },
+
+  "pillars": {
+    "mayaExperience": {
+      "summary": "Immersive cultural layer bridging ancient Maya knowledge with each guest's stay.",
+      "includes": [
+        "Personalized Tzolk'in journey",
+        "Nawal day-sign readings",
+        "Cenote and sacred site recommendations",
+        "Ceremony suggestions",
+        "Curated local cultural partners"
+      ]
+    },
+    "guestExperience": {
+      "summary": "Hosting, amenities, and concierge that make the stay effortless.",
+      "includes": [
+        "Check-in coordination",
+        "On-property comforts",
+        "Local coordination and concierge",
+        "Last-mile transport on request",
+        "Day-to-day support"
+      ]
+    }
+  },
+
+  "tzolkinJourney": {
+    "available": true,
+    "summary": "A personalized itinerary built from the three Maya day signs that fall on a guest's arrival, full day, and departure dates.",
+    "endpoint": "https://templia.art/api/tzolkin/journey",
+    "guestPage": "https://templia.art/journey/",
+    "languages": ["en", "es"]
+  },
+
+  "suggestedStays": [
+    {
+      "nights": "3-4",
+      "label": "Short reset",
+      "themes": ["cenotes", "ruins", "beach reset"]
+    },
+    {
+      "nights": "5-7",
+      "label": "Full immersion",
+      "themes": ["cenotes", "ruins", "beach", "Coba or Sian Ka'an day trip", "food tour"]
+    }
+  ],
+
+  "retreats": {
+    "available": true,
+    "fitsFor": ["wellness", "creative", "corporate off-site", "cultural immersion"],
+    "supportingFeatures": [
+      "Private pool",
+      "Studio workspace",
+      "Double-height living space",
+      "Steam shower",
+      "Mayan firepit",
+      "Custom Tzolk'in programming",
+      "Local provider coordination"
+    ],
+    "contact": "stay@templia.art"
+  },
+
+  "airports": [
+    {
+      "code": "TQO",
+      "name": "Tulum International Airport",
+      "openedYear": 2023,
+      "preferred": true,
+      "distanceNote": "Closest airport to Templia; opened December 2023."
+    },
+    {
+      "code": "CUN",
+      "name": "Cancun International Airport",
+      "preferred": false,
+      "distanceNote": "Approximately 2 hours north; reachable by ADO bus, private shuttle, or rental car."
+    }
+  ],
+
+  "lastMile": {
+    "pickupAvailable": true,
+    "request": "stay@templia.art"
+  },
+
+  "nearby": [
+    {
+      "name": "Parque del Jaguar",
+      "type": "park",
+      "description": "1,000-hectare protected natural reserve with walking trails, bike paths, miradors, archaeological zones, and public Caribbean beaches.",
+      "url": "https://tulumjaguarpark.com"
+    },
+    {
+      "name": "Museo Regional de la Costa Oriental (Mureco)",
+      "type": "museum",
+      "description": "1,200+ m² of exhibition space inside Parque del Jaguar; 300+ original artifacts and 50 replicas covering Caribbean Maya culture from prehistoric times to present. Open daily 9:00-17:00.",
+      "url": "https://www.inah.gob.mx/museos/museo-regional-de-la-costa-oriental"
+    },
+    {
+      "name": "Tulum Archaeological Zone",
+      "type": "archaeological-site",
+      "description": "Walled Postclassic Maya port city overlooking the Caribbean."
+    },
+    {
+      "name": "Gran Cenote",
+      "type": "cenote",
+      "description": "One of the most-visited open cenotes in the Tulum area."
+    },
+    {
+      "name": "Cenote Calavera",
+      "type": "cenote",
+      "description": "Compact open cenote close to Tulum town."
+    }
+  ],
+
+  "rating": {
+    "source": "Airbnb",
+    "ratingValue": 4.93,
+    "reviewCount": 41,
+    "bestRating": 5,
+    "worstRating": 1,
+    "asOf": "2026-04-19"
+  },
+
+  "knowsAbout": [
+    "Maya Tzolk'in calendar",
+    "Sacred cenotes",
+    "Cultural tourism in Tulum",
+    "Luxury retreat experiences"
+  ],
+
+  "sourceOfTruth": {
+    "facts": "https://templia.art/api/property.json",
+    "availability": "https://templia.art/availability.ics",
+    "rates": "https://stay.templia.art",
+    "narrative": "https://templia.art/llms.txt"
+  }
+}
