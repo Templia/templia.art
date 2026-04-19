@@ -1,0 +1,19 @@
+name = "templia-markdown-for-agents"
+main = "src/index.js"
+compatibility_date = "2026-04-17"
+
+# Run on every request to templia.art. The Worker short-circuits
+# (simple fetch pass-through) unless the client asked for markdown.
+[[routes]]
+pattern = "templia.art/*"
+zone_name = "templia.art"
+
+# Workers AI binding — used for `env.AI.toMarkdown(...)`.
+# This is the same conversion engine that powers Cloudflare's native
+# Markdown for Agents feature on paid plans.
+[ai]
+binding = "AI"
+
+# Observability — free tier, helps when debugging deploys.
+[observability]
+enabled = true
