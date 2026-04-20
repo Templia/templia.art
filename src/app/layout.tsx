@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { WebMCPProvider } from "@/components/WebMCPProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -43,6 +44,7 @@ export default function RootLayout({
           }}
         />
         <ThemeToggle />
+        <WebMCPProvider />
         {children}
       </body>
     </html>
