@@ -32,6 +32,7 @@ const AVAILABILITY_SOURCE_URL =
 const AVAILABILITY_PUBLIC_URL = "https://templia.art/availability.ics";
 const MIN_NIGHTS = 3;
 const MAX_WINDOW_DAYS = 365;
+const TZOLKIN_MAX_WINDOW_DAYS = 60;
 
 /** Standard CORS + cache headers for JSON API responses. */
 function jsonHeaders({ maxAge = 300 } = {}) {
@@ -397,6 +398,203 @@ async function handleMarkdownOrPassthrough(request, env, ctx) {
 }
 
 // ---------------------------------------------------------------------------
+// Tzolk'in Journey handler
+//   GET /api/tzolkin/journey?from=YYYY-MM-DD&to=YYYY-MM-DD
+//
+// The Tzolk'in is the 260-day Maya sacred calendar — 20 day signs × 13 tones.
+// Given a check-in and check-out, we return the day sign/tone for:
+//   - arrival (from)
+//   - departure (to)
+//   - each "full day" in between (from+1 .. to-1)
+//
+// Anchor: 2026-02-10 = 6 Kawoq. This matches the engine in src/lib/tzolkin.ts
+// used by the Next.js app, so the Worker and the app agree on every date.
+// ---------------------------------------------------------------------------
+
+const DAY_SIGNS = [
+  { number: 1, name: "Imox", englishName: "Crocodile", glyph: "imox.svg",
+    themes: ["Primordial Waters", "Intuition", "New Beginnings"],
+    element: "Water", direction: "East",
+    description: "Imox is the first day sign — the cosmic womb, the primordial waters from which all creation emerges. It governs intuition, the dream world, and the unconscious mind." },
+  { number: 2, name: "Iq'", englishName: "Wind", glyph: "iq.svg",
+    themes: ["Breath of Life", "Communication", "Spirit"],
+    element: "Air", direction: "North",
+    description: "Iq' is the breath of life, the invisible force that moves through all things. It governs communication, inspiration, and the connection between the physical and spiritual worlds." },
+  { number: 3, name: "Aq'ab'al", englishName: "Night", glyph: "aqabal.svg",
+    themes: ["Dawn", "Darkness", "Renewal"],
+    element: "Earth", direction: "West",
+    description: "Aq'ab'al is the threshold between darkness and light, the moment before dawn. It governs renewal, inner reflection, and the courage to face the unknown." },
+  { number: 4, name: "K'at", englishName: "Net", glyph: "kat.svg",
+    themes: ["Abundance", "Gathering", "Entanglement"],
+    element: "Fire", direction: "South",
+    description: "K'at is the sacred net that holds together all that we gather — blessings, memories, and lessons. It governs abundance but also warns of entanglement." },
+  { number: 5, name: "Kan", englishName: "Serpent", glyph: "kan.svg",
+    themes: ["Life Force", "Kundalini", "Transformation"],
+    element: "Water", direction: "East",
+    description: "Kan is the feathered serpent, Kukulkan — raw life force energy rising through the body. It governs vitality, sensuality, and the power of transformation." },
+  { number: 6, name: "Kame", englishName: "Death", glyph: "kame.svg",
+    themes: ["Transformation", "Ancestors", "Rebirth"],
+    element: "Air", direction: "North",
+    description: "Kame is the sacred transformer — not an ending but a passage. It governs ancestral connection, the wisdom of letting go, and the rebirth that follows release." },
+  { number: 7, name: "Kej", englishName: "Deer", glyph: "kej.svg",
+    themes: ["Harmony", "Four Pillars", "Nature"],
+    element: "Earth", direction: "West",
+    description: "Kej is the deer, guardian of the four pillars that hold up the sky. It governs harmony with nature, leadership through grace, and the strength of gentleness." },
+  { number: 8, name: "Q'anil", englishName: "Seed", glyph: "qanil.svg",
+    themes: ["Fertility", "Creation", "Ripening"],
+    element: "Fire", direction: "South",
+    description: "Q'anil is the seed of life, the promise of harvest. It governs fertility, new projects, and the patient trust that what is planted will bloom." },
+  { number: 9, name: "Toj", englishName: "Offering", glyph: "toj.svg",
+    themes: ["Gratitude", "Payment", "Sacred Fire"],
+    element: "Water", direction: "East",
+    description: "Toj is the sacred offering, the fire ceremony. It governs gratitude, reciprocity with the cosmos, and the understanding that giving is the path to receiving." },
+  { number: 10, name: "Tz'i'", englishName: "Dog", glyph: "tzi.svg",
+    themes: ["Loyalty", "Justice", "Authority"],
+    element: "Air", direction: "North",
+    description: "Tz'i' is the faithful companion, guardian of justice and truth. It governs loyalty, the law of cause and effect, and the authority that comes from integrity." },
+  { number: 11, name: "B'atz'", englishName: "Monkey", glyph: "batz.svg",
+    themes: ["Weaving", "Art", "Time"],
+    element: "Earth", direction: "West",
+    description: "B'atz' is the cosmic weaver, the thread of time itself. It governs creativity, artistic expression, and the understanding that all of life is a tapestry being woven." },
+  { number: 12, name: "E", englishName: "Road", glyph: "e.svg",
+    themes: ["Destiny", "Path", "Travel"],
+    element: "Fire", direction: "South",
+    description: "E is the sacred road, the path of destiny. It governs journeys both physical and spiritual, the courage to walk your path, and the guidance found along the way." },
+  { number: 13, name: "Aj", englishName: "Reed", glyph: "aj.svg",
+    themes: ["Home", "Authority", "Backbone"],
+    element: "Water", direction: "East",
+    description: "Aj is the reed, the backbone of the home and community. It governs domestic harmony, structural strength, and the authority that comes from standing tall." },
+  { number: 14, name: "Ix", englishName: "Jaguar", glyph: "ix.svg",
+    themes: ["Earth Force", "Feminine Power", "Mystery"],
+    element: "Air", direction: "North",
+    description: "Ix is the jaguar, the feminine power of the Earth. It governs the mysteries of nature, shamanic vision, and the deep intuitive wisdom of the wild." },
+  { number: 15, name: "Tz'ikin", englishName: "Eagle", glyph: "tzikin.svg",
+    themes: ["Vision", "Freedom", "Prosperity"],
+    element: "Earth", direction: "West",
+    description: "Tz'ikin is the eagle, the intermediary between heaven and earth. It governs expansive vision, spiritual freedom, and the abundance that comes from seeing the whole picture." },
+  { number: 16, name: "Ajmaq", englishName: "Owl", glyph: "ajmaq.svg",
+    themes: ["Forgiveness", "Wisdom", "Ancestors"],
+    element: "Fire", direction: "South",
+    description: "Ajmaq is the owl, keeper of ancestral wisdom. It governs forgiveness, the courage to face our shadow, and the deep wisdom that emerges from honest self-reflection." },
+  { number: 17, name: "No'j", englishName: "Earthquake", glyph: "noj.svg",
+    themes: ["Knowledge", "Mind", "Movement"],
+    element: "Water", direction: "East",
+    description: "No'j is the earthquake, the movement of thought. It governs the mind, knowledge, intellectual pursuit, and the understanding that true wisdom shakes the foundations." },
+  { number: 18, name: "Tijax", englishName: "Obsidian", glyph: "tijax.svg",
+    themes: ["Healing", "Cutting Away", "Truth"],
+    element: "Air", direction: "North",
+    description: "Tijax is the obsidian blade, the healer's knife. It governs the power to cut away what no longer serves, truth that heals, and the precision of sacred medicine." },
+  { number: 19, name: "Kawoq", englishName: "Storm", glyph: "kawoq.svg",
+    themes: ["Purification", "Community", "Divine Feminine"],
+    element: "Earth", direction: "West",
+    description: "Kawoq is the storm that purifies, the voice of the Divine Feminine. It governs community, fertility of the land, and the cleansing power that prepares new ground." },
+  { number: 20, name: "Ajpu", englishName: "Sun", glyph: "ajpu.svg",
+    themes: ["Illumination", "Heroism", "Divine Wholeness"],
+    element: "Fire", direction: "South",
+    description: "Ajpu is the Sun, the Lord of Light, the final day sign of the Tzolkin. It governs illumination, the hero's journey, and the divine wholeness that lives within each of us." },
+];
+
+const TONES = [
+  { number: 1, name: "Jun", meaning: "Unity", description: "The beginning, the point of origin. Pure potential, undivided wholeness." },
+  { number: 2, name: "Ka'", meaning: "Duality", description: "The creative tension of opposites. Polarity, balance, and the dance of complementary forces." },
+  { number: 3, name: "Ox", meaning: "Action", description: "The catalyst of movement. Rhythm, communication, and the spark that sets things in motion." },
+  { number: 4, name: "Kaj", meaning: "Stability", description: "The four pillars, the four directions. Structure, form, and the foundation upon which all is built." },
+  { number: 5, name: "Jo'", meaning: "Empowerment", description: "The center point. Taking command, empowerment, and the peak of the first wave." },
+  { number: 6, name: "Waq", meaning: "Flow", description: "Organic flow and dynamic equilibrium. Stability in motion, the rhythm of give and receive." },
+  { number: 7, name: "Wuq", meaning: "Mystical Center", description: "The mystic column, the center of the Tzolkin. Reflection, purpose, and the portal between worlds." },
+  { number: 8, name: "Wajxaq", meaning: "Harmony", description: "Harmony, abundance, and integration. The number of justice, balance achieved through wholeness." },
+  { number: 9, name: "B'elej", meaning: "Patience", description: "The completion of cycles, perseverance. Greater patience brings greater realization." },
+  { number: 10, name: "Lajuj", meaning: "Manifestation", description: "Manifestation in the material world. Challenge met, intention made real." },
+  { number: 11, name: "Jun Lajuj", meaning: "Resolution", description: "Dissolution and resolution. Simplification, letting go of what is not essential." },
+  { number: 12, name: "Ka' Lajuj", meaning: "Understanding", description: "Complex understanding, shared knowledge. Community wisdom and collective purpose." },
+  { number: 13, name: "Oxlajuj", meaning: "Transcendence", description: "The highest tone. Cosmic completion, ascension, and the doorway to the next cycle." },
+];
+
+// Anchor: Feb 10, 2026 = 6 Kawoq. Same as src/lib/tzolkin.ts.
+const TZOLKIN_ANCHOR_DATE = Date.UTC(2026, 1, 10);
+const TZOLKIN_ANCHOR_TONE = 6;        // 1-based
+const TZOLKIN_ANCHOR_DAY_SIGN = 19;   // Kawoq, 1-based
+
+function mod(n, m) {
+  return ((n % m) + m) % m;
+}
+
+/** Given a UTC-midnight Date, return { date, displayName, tone, daySign }. */
+function tzolkinDateFor(date) {
+  const diff = Math.round((date.getTime() - TZOLKIN_ANCHOR_DATE) / 86400000);
+  const toneIndex = mod((TZOLKIN_ANCHOR_TONE - 1) + diff, 13);
+  const daySignIndex = mod((TZOLKIN_ANCHOR_DAY_SIGN - 1) + diff, 20);
+  const tone = TONES[toneIndex];
+  const daySign = DAY_SIGNS[daySignIndex];
+  return {
+    date: formatIsoDate(date),
+    displayName: `${tone.number} ${daySign.name}`,
+    tone,
+    daySign,
+  };
+}
+
+async function handleTzolkinJourney(request) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: jsonHeaders({ maxAge: 0 }) });
+  }
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    return errorResponse("method_not_allowed", "Use GET.", 405);
+  }
+
+  const url = new URL(request.url);
+  const today = new Date(Date.UTC(
+    new Date().getUTCFullYear(),
+    new Date().getUTCMonth(),
+    new Date().getUTCDate(),
+  ));
+  const fromParam = url.searchParams.get("from");
+  const toParam = url.searchParams.get("to");
+
+  const from = fromParam ? parseIsoDate(fromParam) : today;
+  const to = toParam ? parseIsoDate(toParam) : addDays(today, 3);
+
+  if (!from) return errorResponse("invalid_from", "`from` must be YYYY-MM-DD.");
+  if (!to) return errorResponse("invalid_to", "`to` must be YYYY-MM-DD.");
+  const nights = daysBetween(from, to);
+  if (nights <= 0) {
+    return errorResponse("invalid_range", "`to` must be after `from`.");
+  }
+  if (nights > TZOLKIN_MAX_WINDOW_DAYS) {
+    return errorResponse(
+      "window_too_large",
+      `Maximum window is ${TZOLKIN_MAX_WINDOW_DAYS} days.`,
+    );
+  }
+
+  const arrival = tzolkinDateFor(from);
+  const departure = tzolkinDateFor(to);
+  const fullDays = [];
+  // Full days are the nights you actually spend inside the stay:
+  //   from+1 .. to-1 (inclusive).
+  for (let i = 1; i < nights; i++) {
+    fullDays.push(tzolkinDateFor(addDays(from, i)));
+  }
+
+  const body = {
+    from: formatIsoDate(from),
+    to: formatIsoDate(to),
+    nights,
+    arrival,
+    fullDays,
+    departure,
+    anchor: {
+      date: "2026-02-10",
+      tzolkin: "6 Kawoq",
+      note: "All Tzolk'in dates in this response are computed from this anchor.",
+    },
+    credit: "Tzolk'in interpretations are adapted from the Mayan calendar tradition and are intended for contemplative use.",
+  };
+
+  return jsonResponse(body, { maxAge: 86400 });
+}
+
+// ---------------------------------------------------------------------------
 // Router
 // ---------------------------------------------------------------------------
 
@@ -404,6 +602,9 @@ function route(request) {
   const { pathname } = new URL(request.url);
   if (pathname === "/api/availability" || pathname === "/api/availability/") {
     return handleAvailability;
+  }
+  if (pathname === "/api/tzolkin/journey" || pathname === "/api/tzolkin/journey/") {
+    return handleTzolkinJourney;
   }
   return handleMarkdownOrPassthrough;
 }

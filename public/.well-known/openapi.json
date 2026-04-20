@@ -3,7 +3,7 @@
   "info": {
     "title": "Templia Art API",
     "summary": "Agent-friendly API for booking and planning a Mayan-inspired stay in Aldea Zama, Tulum.",
-    "description": "The Templia Art API exposes canonical property facts, live availability, and (coming soon) personalized Tzolk'in journey suggestions. All endpoints are JSON, CORS-enabled, and cacheable. Live nightly rates and booking actions are not exposed here — rates are managed on Airbnb (https://stay.templia.art) and direct bookings go to stay@templia.art.\n\nComplementary non-API resources:\n- https://templia.art/llms.txt — agent/LLM guide\n- https://templia.art/.well-known/agent-skills/index.json — agent skills discovery\n- https://templia.art/availability.ics — iCal feed (text/calendar), same data as /api/availability",
+    "description": "The Templia Art API exposes canonical property facts, live availability, and a personalized Tzolk'in journey for any date window. All endpoints are JSON, CORS-enabled, and cacheable. Live nightly rates and booking actions are not exposed here — rates are managed on Airbnb (https://stay.templia.art) and direct bookings go to stay@templia.art.\n\nComplementary non-API resources:\n- https://templia.art/llms.txt — agent/LLM guide\n- https://templia.art/.well-known/agent-skills/index.json — agent skills discovery\n- https://templia.art/availability.ics — iCal feed (text/calendar), same data as /api/availability",
     "version": "1.0.0",
     "termsOfService": "https://templia.art/",
     "contact": {
@@ -31,6 +31,10 @@
     {
       "name": "availability",
       "description": "Live booking availability derived from the Airbnb-synced calendar."
+    },
+    {
+      "name": "tzolkin",
+      "description": "Tzolk'in (260-day Maya sacred calendar) readings for dates and stay windows."
     }
   ],
   "paths": {
@@ -201,6 +205,94 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/tzolkin/journey": {
+      "get": {
+        "tags": ["tzolkin"],
+        "operationId": "getTzolkinJourney",
+        "summary": "Tzolk'in journey for a stay window",
+        "description": "Returns the Tzolk'in day sign and tone for the arrival date, the departure date, and every full day in between. Computation is deterministic from a fixed anchor (2026-02-10 = 6 Kawoq) and matches the reading shown on the Templia homepage.\n\nThe Tzolk'in is the 260-day Maya sacred calendar — 20 day signs (Imox, Iq', Aq'ab'al, K'at, Kan, Kame, Kej, Q'anil, Toj, Tz'i', B'atz', E, Aj, Ix, Tz'ikin, Ajmaq, No'j, Tijax, Kawoq, Ajpu) cycled with 13 tones. Each entry carries the day sign's name, element, cardinal direction, themes, and a short contemplative description.\n\nIntended for guide agents that want to weave the Tzolk'in reading into an itinerary suggestion, welcome message, or pre-arrival note. Not a booking action.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Arrival date (inclusive). ISO 8601 `YYYY-MM-DD`. Defaults to today.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "example": "2026-06-01"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Departure date (exclusive). ISO 8601 `YYYY-MM-DD`. Must be after `from`. Max window 60 days. Defaults to today+3.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            },
+            "example": "2026-06-05"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tzolk'in journey for the requested window.",
+            "headers": {
+              "Cache-Control": {
+                "schema": { "type": "string" },
+                "example": "public, max-age=86400"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TzolkinJourney" },
+                "examples": {
+                  "anchor": {
+                    "summary": "Three nights from the anchor date",
+                    "value": {
+                      "from": "2026-02-10",
+                      "to": "2026-02-13",
+                      "nights": 3,
+                      "arrival": {
+                        "date": "2026-02-10",
+                        "displayName": "6 Kawoq",
+                        "tone": { "number": 6, "name": "Waq", "meaning": "Flow" },
+                        "daySign": { "number": 19, "name": "Kawoq", "englishName": "Storm", "element": "Earth", "direction": "West" }
+                      },
+                      "fullDays": [
+                        { "date": "2026-02-11", "displayName": "7 Ajpu" },
+                        { "date": "2026-02-12", "displayName": "8 Imox" }
+                      ],
+                      "departure": {
+                        "date": "2026-02-13",
+                        "displayName": "9 Iq'"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" },
+                "example": {
+                  "error": {
+                    "code": "window_too_large",
+                    "message": "Maximum window is 60 days."
+                  }
+                }
               }
             }
           }
@@ -389,6 +481,75 @@
           "disclaimer": {
             "type": "string"
           }
+        }
+      },
+      "TzolkinReading": {
+        "type": "object",
+        "description": "A single day's Tzolk'in reading — day sign (what) × tone (how).",
+        "required": ["date", "displayName", "tone", "daySign"],
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "displayName": {
+            "type": "string",
+            "description": "Human-readable combination, e.g. `6 Kawoq`.",
+            "example": "6 Kawoq"
+          },
+          "tone": {
+            "type": "object",
+            "required": ["number", "name", "meaning"],
+            "properties": {
+              "number": { "type": "integer", "minimum": 1, "maximum": 13 },
+              "name": { "type": "string", "example": "Waq" },
+              "meaning": { "type": "string", "example": "Flow" },
+              "description": { "type": "string" }
+            }
+          },
+          "daySign": {
+            "type": "object",
+            "required": ["number", "name", "englishName", "element", "direction"],
+            "properties": {
+              "number": { "type": "integer", "minimum": 1, "maximum": 20 },
+              "name": { "type": "string", "example": "Kawoq" },
+              "englishName": { "type": "string", "example": "Storm" },
+              "element": {
+                "type": "string",
+                "enum": ["Water", "Air", "Earth", "Fire"]
+              },
+              "direction": {
+                "type": "string",
+                "enum": ["East", "North", "West", "South"]
+              },
+              "themes": { "type": "array", "items": { "type": "string" } },
+              "description": { "type": "string" },
+              "glyph": { "type": "string", "description": "SVG filename under /glyphs/" }
+            }
+          }
+        }
+      },
+      "TzolkinJourney": {
+        "type": "object",
+        "description": "Tzolk'in reading for an entire stay window. `fullDays` covers every day between arrival and departure (exclusive on both ends).",
+        "required": ["from", "to", "nights", "arrival", "fullDays", "departure"],
+        "properties": {
+          "from": { "type": "string", "format": "date" },
+          "to": { "type": "string", "format": "date" },
+          "nights": { "type": "integer", "minimum": 1 },
+          "arrival": { "$ref": "#/components/schemas/TzolkinReading" },
+          "fullDays": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/TzolkinReading" },
+            "description": "Empty for 1-night stays; otherwise `nights - 1` entries."
+          },
+          "departure": { "$ref": "#/components/schemas/TzolkinReading" },
+          "anchor": {
+            "type": "object",
+            "properties": {
+              "date": { "type": "string", "format": "date", "example": "2026-02-10" },
+              "tzolkin": { "type": "string", "example": "6 Kawoq" },
+              "note": { "type": "string" }
+            }
+          },
+          "credit": { "type": "string" }
         }
       },
       "Error": {
