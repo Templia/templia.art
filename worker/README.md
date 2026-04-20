@@ -1,11 +1,12 @@
 # templia-edge worker (deployed as `templia-markdown-for-agents`)
 
-Cloudflare Worker bound to `templia.art/*`. Four jobs today:
+Cloudflare Worker bound to `templia.art/*`. Five jobs today:
 
 1. **`/api/availability`** — JSON availability window parsed from the Airbnb-synced iCal feed at `https://templia.art/availability.ics`.
 2. **`/api/tzolkin/journey`** — Tzolk'in (Maya sacred calendar) reading for an arrival/departure window. Deterministic from the anchor `2026-02-10 = 6 Kawoq`; matches `src/lib/tzolkin.ts` used by the app.
 3. **`/.well-known/api-catalog`** — [RFC 9727](https://www.rfc-editor.org/rfc/rfc9727) API Catalog published as an [RFC 9264](https://www.rfc-editor.org/rfc/rfc9264) linkset (`application/linkset+json`). One entry per public API; each anchors the endpoint URL and links to `service-desc` (`/.well-known/openapi.json`) and `service-doc` (`/llms.txt`).
-4. **Markdown for Agents** — when a client sends `Accept: text/markdown`, the Worker intercepts, fetches the HTML version from origin, converts it with Workers AI's `toMarkdown()` utility, and returns `Content-Type: text/markdown; charset=utf-8` plus `x-markdown-tokens` and `Vary: Accept`. Reproduces the native [Markdown for Agents](https://developers.cloudflare.com/fundamentals/reference/markdown-for-agents/) feature on the Free plan.
+4. **`/mcp` + `/.well-known/mcp-server-card`** — Model Context Protocol server (Streamable HTTP, stateless, protocol version `2025-11-25`). Three tools wrap the APIs above: `check_availability`, `get_property_info`, `get_tzolkin_reading`. The card is also served at the legacy SEP-1649 path `/.well-known/mcp/server-card.json` so current discovery scanners find it.
+5. **Markdown for Agents** — when a client sends `Accept: text/markdown`, the Worker intercepts, fetches the HTML version from origin, converts it with Workers AI's `toMarkdown()` utility, and returns `Content-Type: text/markdown; charset=utf-8` plus `x-markdown-tokens` and `Vary: Accept`. Reproduces the native [Markdown for Agents](https://developers.cloudflare.com/fundamentals/reference/markdown-for-agents/) feature on the Free plan.
 
 All other requests pass through unchanged. The `templia.art/availability.ics` route is owned by a separate Worker (`templia-availability-ics`) that proxies Google Calendar — Cloudflare picks the more-specific route first, so we can safely fetch that URL from here without recursing.
 
@@ -101,6 +102,43 @@ Expected shape:
 }
 ```
 
+### `/mcp` + `/.well-known/mcp-server-card`
+
+```bash
+# Server card (SEP-2127 canonical path)
+curl -s https://templia.art/.well-known/mcp-server-card | python3 -m json.tool
+
+# Legacy / scanner path — same body
+curl -s https://templia.art/.well-known/mcp/server-card.json | python3 -m json.tool
+
+# Initialize handshake
+curl -s -X POST https://templia.art/mcp \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"curl","version":"0"}}}' \
+  | python3 -m json.tool
+
+# tools/list
+curl -s -X POST https://templia.art/mcp \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' \
+  | python3 -m json.tool
+
+# tools/call — Tzolk'in reading at the anchor (should return "6 Kawoq")
+curl -s -X POST https://templia.art/mcp \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json' \
+  -d '{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"get_tzolkin_reading","arguments":{"from":"2026-02-10","to":"2026-02-13"}}}' \
+  | python3 -c 'import json,sys;d=json.load(sys.stdin);print(d["result"]["structuredContent"]["arrival"]["displayName"])'
+```
+
+Offline unit tests (no network, stubbed fetch):
+
+```bash
+cd worker && npm test
+```
+
 ### `/.well-known/api-catalog`
 
 ```bash
@@ -169,6 +207,17 @@ x-markdown-tokens: <number>
 - `fullDays.length === nights - 1` (0 for a 1-night stay).
 - Purely computational; no upstream fetch. Response is cached `max-age=86400`.
 - Anchor date is `2026-02-10 = 6 Kawoq`, matching `src/lib/tzolkin.ts` so the app and the API agree on every date.
+
+### `/mcp` + `/.well-known/mcp-server-card`
+
+- **Transport:** Streamable HTTP, stateless. One JSON-RPC request per POST → one response. No sessions, no SSE stream, no server-initiated notifications. GET/HEAD return `405` with `Allow: POST, OPTIONS`.
+- **Protocol version advertised:** `2025-11-25` (primary) + `2025-06-18` (compat). Initialize echoes the client's requested version if supported; otherwise falls back to `2025-11-25`. Every POST response includes `Mcp-Protocol-Version: 2025-11-25`.
+- **Tools:** `check_availability`, `get_property_info`, `get_tzolkin_reading` — each calls the existing handler in-process (no network re-entry). `get_property_info` fetches `templia.art/api/property.json` from origin (same-zone subrequests bypass the Workers layer, so no loop).
+- **Result shape:** each tool call returns both `content: [{type: "text", text: <JSON>}]` and `structuredContent: <parsed JSON>`. Upstream validation errors (e.g. malformed dates) surface as `isError: true` with the original error payload — clients can read it and retry without a JSON-RPC transport error.
+- **Notifications:** `notifications/initialized` and `notifications/cancelled` accepted; response is `202` with empty body.
+- **CORS:** `Access-Control-Allow-Origin: *`, all MCP custom headers exposed; OPTIONS returns 204.
+- **Card paths:** `/.well-known/mcp-server-card` (SEP-2127 canonical) and `/.well-known/mcp/server-card.json` (SEP-1649 / current discovery scanners). Same body, `Cache-Control: public, max-age=3600`.
+- **Adding a tool:** add to `MCP_TOOLS`, add a `callToolX` helper, add a branch to `dispatchToolCall`, add an entry to `API_CATALOG` if it becomes a separately-anchored endpoint, update `test/mcp.test.mjs`.
 
 ### `/.well-known/api-catalog`
 

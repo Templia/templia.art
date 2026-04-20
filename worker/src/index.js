@@ -653,6 +653,21 @@ const API_CATALOG = {
         },
       ],
     },
+    {
+      anchor: "https://templia.art/mcp",
+      "service-desc": [
+        {
+          href: "https://templia.art/.well-known/mcp-server-card",
+          type: "application/json",
+        },
+      ],
+      "service-doc": [
+        {
+          href: "https://templia.art/llms.txt",
+          type: "text/plain",
+        },
+      ],
+    },
   ],
 };
 
@@ -693,6 +708,331 @@ function handleApiCatalog(request) {
 }
 
 // ---------------------------------------------------------------------------
+// /mcp — Model Context Protocol server (Streamable HTTP, stateless)
+// ---------------------------------------------------------------------------
+//
+// Single JSON-RPC 2.0 request per HTTP POST → single response. No sessions,
+// no SSE stream, no server-initiated notifications. The three tools wrap the
+// existing public APIs in-process (no re-entry through the Workers layer).
+//
+// Spec: https://modelcontextprotocol.io/specification/2025-11-25
+// Card: https://github.com/modelcontextprotocol/modelcontextprotocol/pull/2127
+
+const MCP_LATEST_PROTOCOL_VERSION = "2025-11-25";
+const MCP_SUPPORTED_PROTOCOL_VERSIONS = ["2025-11-25", "2025-06-18"];
+const MCP_SERVER_NAME = "art.templia/templia";
+const MCP_SERVER_TITLE = "Templia";
+const MCP_SERVER_VERSION = "0.1.0";
+const MCP_SERVER_DESCRIPTION =
+  "Public API server for Templia, a Mayan-inspired luxury vacation rental in Tulum, Mexico. Exposes live availability, canonical property information, and a Tzolk'in (Maya sacred calendar) reading tool for planning contemplative stays.";
+const MCP_SERVER_WEBSITE = "https://templia.art";
+const MCP_ENDPOINT_URL = "https://templia.art/mcp";
+const MCP_SERVER_INSTRUCTIONS =
+  "Templia is a 3-bedroom private villa in Tulum, Mexico. Use check_availability to gate any date-specific suggestions, get_property_info for amenities/policies/booking link, and get_tzolkin_reading for the ceremonial Maya-calendar context of a given stay window. Minimum stay is 3 nights. Bookings are completed on https://stay.templia.art — this server does not accept bookings, payments, or personal data.";
+
+const MCP_TOOLS = [
+  {
+    name: "check_availability",
+    title: "Check availability",
+    description:
+      "Check whether Templia is available for a stay window. Returns whether the window is bookable, the minimum-nights requirement (3), any blocked ranges inside the window, and the booking URL. Source is the Airbnb-synced iCal feed; calendar lag is possible — always confirm on the booking page before committing.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        from: {
+          type: "string",
+          format: "date",
+          description: "Arrival date (YYYY-MM-DD). Defaults to today.",
+        },
+        to: {
+          type: "string",
+          format: "date",
+          description: "Departure date (YYYY-MM-DD, exclusive). Defaults to today + 30.",
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "get_property_info",
+    title: "Get property information",
+    description:
+      "Return canonical information about Templia: name, location, description, amenities, pricing signals, policies, booking URL, contact, and images. Stable; safe to cache.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "get_tzolkin_reading",
+    title: "Get Tzolk'in reading for a stay window",
+    description:
+      "Return the Tzolk'in (Maya sacred calendar) day-sign and tone for arrival, each full day, and departure of a stay window. Deterministic from anchor 2026-02-10 = 6 Kawoq. Window capped at 60 days.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        from: {
+          type: "string",
+          format: "date",
+          description: "Arrival date (YYYY-MM-DD). Defaults to today.",
+        },
+        to: {
+          type: "string",
+          format: "date",
+          description: "Departure date (YYYY-MM-DD, exclusive). Defaults to today + 3.",
+        },
+      },
+      additionalProperties: false,
+    },
+  },
+];
+
+function mcpCors() {
+  return {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Access-Control-Allow-Headers":
+      "Content-Type, Accept, Mcp-Session-Id, Mcp-Protocol-Version",
+    "Access-Control-Expose-Headers": "Mcp-Session-Id, Mcp-Protocol-Version",
+    "Access-Control-Max-Age": "3600",
+  };
+}
+
+function rpcError(id, code, message, data) {
+  const err = { code, message };
+  if (data !== undefined) err.data = data;
+  return { jsonrpc: "2.0", id: id ?? null, error: err };
+}
+
+function rpcResult(id, result) {
+  return { jsonrpc: "2.0", id, result };
+}
+
+async function callToolCheckAvailability(args) {
+  const url = new URL("https://templia.art/api/availability");
+  if (args?.from) url.searchParams.set("from", args.from);
+  if (args?.to) url.searchParams.set("to", args.to);
+  const res = await handleAvailability(
+    new Request(url.toString(), { method: "GET" }),
+  );
+  return await res.json();
+}
+
+async function callToolGetPropertyInfo() {
+  // property.json is a static file served by Cloudflare Pages. Same-zone
+  // subrequests from Workers on templia.art/* bypass the Workers layer, so
+  // this hits origin directly — no loop risk.
+  const res = await fetch("https://templia.art/api/property.json", {
+    cf: { cacheTtl: 300 },
+  });
+  if (!res.ok) {
+    throw new Error(`Upstream property.json returned ${res.status}`);
+  }
+  return await res.json();
+}
+
+async function callToolGetTzolkinReading(args) {
+  const url = new URL("https://templia.art/api/tzolkin/journey");
+  if (args?.from) url.searchParams.set("from", args.from);
+  if (args?.to) url.searchParams.set("to", args.to);
+  const res = await handleTzolkinJourney(
+    new Request(url.toString(), { method: "GET" }),
+  );
+  return await res.json();
+}
+
+async function dispatchToolCall(name, args) {
+  if (name === "check_availability") return callToolCheckAvailability(args);
+  if (name === "get_property_info") return callToolGetPropertyInfo();
+  if (name === "get_tzolkin_reading") return callToolGetTzolkinReading(args);
+  const err = new Error(`Unknown tool: ${name}`);
+  err.code = "tool_not_found";
+  throw err;
+}
+
+function toolResultFromData(data) {
+  // If the underlying API signalled an error (e.g. invalid_range), surface it
+  // through MCP's isError flag rather than JSON-RPC error — the caller still
+  // gets structured data they can read and retry.
+  const isError = data && typeof data === "object" && !!data.error;
+  return {
+    isError: isError || undefined,
+    content: [{ type: "text", text: JSON.stringify(data, null, 2) }],
+    structuredContent: data,
+  };
+}
+
+async function handleMcpRpc(message) {
+  if (!message || message.jsonrpc !== "2.0" || typeof message.method !== "string") {
+    return rpcError(message?.id ?? null, -32600, "Invalid Request");
+  }
+  const { id, method, params } = message;
+  const isNotification = !("id" in message);
+
+  try {
+    if (method === "initialize") {
+      const clientVersion = params?.protocolVersion;
+      const protocolVersion = MCP_SUPPORTED_PROTOCOL_VERSIONS.includes(clientVersion)
+        ? clientVersion
+        : MCP_LATEST_PROTOCOL_VERSION;
+      return rpcResult(id, {
+        protocolVersion,
+        capabilities: { tools: {} },
+        serverInfo: {
+          name: MCP_SERVER_NAME,
+          title: MCP_SERVER_TITLE,
+          version: MCP_SERVER_VERSION,
+          description: MCP_SERVER_DESCRIPTION,
+          websiteUrl: MCP_SERVER_WEBSITE,
+        },
+        instructions: MCP_SERVER_INSTRUCTIONS,
+      });
+    }
+
+    if (method === "ping") return rpcResult(id, {});
+
+    if (method === "tools/list") return rpcResult(id, { tools: MCP_TOOLS });
+
+    if (method === "tools/call") {
+      const toolName = params?.name;
+      const toolArgs = params?.arguments ?? {};
+      if (!toolName) return rpcError(id, -32602, "Invalid params: missing 'name'");
+      try {
+        const data = await dispatchToolCall(toolName, toolArgs);
+        return rpcResult(id, toolResultFromData(data));
+      } catch (e) {
+        if (e && e.code === "tool_not_found") {
+          return rpcError(id, -32602, `Invalid params: unknown tool '${toolName}'`);
+        }
+        return rpcResult(id, {
+          isError: true,
+          content: [
+            { type: "text", text: `Tool call failed: ${e?.message || e}` },
+          ],
+        });
+      }
+    }
+
+    if (
+      method === "notifications/initialized" ||
+      method === "notifications/cancelled" ||
+      isNotification
+    ) {
+      return null; // notifications get no response
+    }
+
+    return rpcError(id, -32601, `Method not found: ${method}`);
+  } catch (e) {
+    return rpcError(id, -32603, `Internal error: ${e?.message || e}`);
+  }
+}
+
+async function handleMcp(request) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: mcpCors() });
+  }
+  if (request.method === "GET" || request.method === "HEAD") {
+    // Streamable HTTP permits servers to refuse the server→client SSE stream.
+    return new Response(null, {
+      status: 405,
+      headers: { ...mcpCors(), Allow: "POST, OPTIONS" },
+    });
+  }
+  if (request.method !== "POST") {
+    return new Response("Method Not Allowed", {
+      status: 405,
+      headers: { ...mcpCors(), Allow: "POST, OPTIONS" },
+    });
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify(rpcError(null, -32700, "Parse error")), {
+      status: 400,
+      headers: { "Content-Type": "application/json", ...mcpCors() },
+    });
+  }
+
+  // Single-message only; 2025-11-25 dropped batch requests.
+  if (Array.isArray(body)) {
+    return new Response(
+      JSON.stringify(rpcError(null, -32600, "Batch requests are not supported")),
+      { status: 400, headers: { "Content-Type": "application/json", ...mcpCors() } },
+    );
+  }
+
+  const response = await handleMcpRpc(body);
+
+  if (response === null) {
+    // Notification — spec says return 202 Accepted with empty body.
+    return new Response(null, { status: 202, headers: mcpCors() });
+  }
+
+  return new Response(JSON.stringify(response), {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+      "Mcp-Protocol-Version": MCP_LATEST_PROTOCOL_VERSION,
+      ...mcpCors(),
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// /.well-known/mcp-server-card (SEP-2127)  +  /.well-known/mcp/server-card.json
+// ---------------------------------------------------------------------------
+//
+// The canonical path per SEP-2127 is `/.well-known/mcp-server-card`. We also
+// serve the legacy path `/.well-known/mcp/server-card.json` so existing
+// scanners (e.g. isitagentready.com) can discover us. Same body, same headers.
+
+const MCP_SERVER_CARD = {
+  $schema:
+    "https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json",
+  name: MCP_SERVER_NAME,
+  title: MCP_SERVER_TITLE,
+  version: MCP_SERVER_VERSION,
+  description: MCP_SERVER_DESCRIPTION,
+  websiteUrl: MCP_SERVER_WEBSITE,
+  remotes: [
+    {
+      type: "streamable-http",
+      url: MCP_ENDPOINT_URL,
+      supportedProtocolVersions: MCP_SUPPORTED_PROTOCOL_VERSIONS,
+    },
+  ],
+  _meta: {
+    "art.templia/tools": MCP_TOOLS.map((t) => ({
+      name: t.name,
+      title: t.title,
+      description: t.description,
+    })),
+  },
+};
+const MCP_SERVER_CARD_BODY = JSON.stringify(MCP_SERVER_CARD, null, 2);
+
+function handleMcpServerCard(request) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: mcpCors() });
+  }
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    return errorResponse("method_not_allowed", "Use GET or HEAD.", 405);
+  }
+  return new Response(request.method === "HEAD" ? null : MCP_SERVER_CARD_BODY, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "public, max-age=3600",
+      Link: '</.well-known/mcp-server-card>; rel="mcp-server-card"; type="application/json"',
+      ...mcpCors(),
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Router
 // ---------------------------------------------------------------------------
 
@@ -706,6 +1046,16 @@ function route(request) {
   }
   if (pathname === "/.well-known/api-catalog" || pathname === "/.well-known/api-catalog/") {
     return handleApiCatalog;
+  }
+  if (pathname === "/mcp" || pathname === "/mcp/") {
+    return handleMcp;
+  }
+  if (
+    pathname === "/.well-known/mcp-server-card" ||
+    pathname === "/.well-known/mcp-server-card/" ||
+    pathname === "/.well-known/mcp/server-card.json"
+  ) {
+    return handleMcpServerCard;
   }
   return handleMarkdownOrPassthrough;
 }
