@@ -1,8 +1,8 @@
 {
   "name": "templia-markdown-for-agents",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
-  "description": "Cloudflare Worker on templia.art/*. Routes: /api/availability (JSON availability parsed from Airbnb-synced iCal), /api/tzolkin/journey (Maya sacred calendar reading for a stay window). Content negotiation: Accept: text/markdown turns HTML responses into markdown via Workers AI toMarkdown, reproducing the native Markdown for Agents feature on the Free plan.",
+  "description": "Cloudflare Worker on templia.art/*. Routes: /api/availability (JSON availability parsed from Airbnb-synced iCal), /api/tzolkin/journey (Maya sacred calendar reading for a stay window), /.well-known/api-catalog (RFC 9727 linkset for API discovery). Content negotiation: Accept: text/markdown turns HTML responses into markdown via Workers AI toMarkdown, reproducing the native Markdown for Agents feature on the Free plan.",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",

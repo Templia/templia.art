@@ -1,10 +1,11 @@
 # templia-edge worker (deployed as `templia-markdown-for-agents`)
 
-Cloudflare Worker bound to `templia.art/*`. Three jobs today:
+Cloudflare Worker bound to `templia.art/*`. Four jobs today:
 
 1. **`/api/availability`** — JSON availability window parsed from the Airbnb-synced iCal feed at `https://templia.art/availability.ics`.
 2. **`/api/tzolkin/journey`** — Tzolk'in (Maya sacred calendar) reading for an arrival/departure window. Deterministic from the anchor `2026-02-10 = 6 Kawoq`; matches `src/lib/tzolkin.ts` used by the app.
-3. **Markdown for Agents** — when a client sends `Accept: text/markdown`, the Worker intercepts, fetches the HTML version from origin, converts it with Workers AI's `toMarkdown()` utility, and returns `Content-Type: text/markdown; charset=utf-8` plus `x-markdown-tokens` and `Vary: Accept`. Reproduces the native [Markdown for Agents](https://developers.cloudflare.com/fundamentals/reference/markdown-for-agents/) feature on the Free plan.
+3. **`/.well-known/api-catalog`** — [RFC 9727](https://www.rfc-editor.org/rfc/rfc9727) API Catalog published as an [RFC 9264](https://www.rfc-editor.org/rfc/rfc9264) linkset (`application/linkset+json`). One entry per public API; each anchors the endpoint URL and links to `service-desc` (`/.well-known/openapi.json`) and `service-doc` (`/llms.txt`).
+4. **Markdown for Agents** — when a client sends `Accept: text/markdown`, the Worker intercepts, fetches the HTML version from origin, converts it with Workers AI's `toMarkdown()` utility, and returns `Content-Type: text/markdown; charset=utf-8` plus `x-markdown-tokens` and `Vary: Accept`. Reproduces the native [Markdown for Agents](https://developers.cloudflare.com/fundamentals/reference/markdown-for-agents/) feature on the Free plan.
 
 All other requests pass through unchanged. The `templia.art/availability.ics` route is owned by a separate Worker (`templia-availability-ics`) that proxies Google Calendar — Cloudflare picks the more-specific route first, so we can safely fetch that URL from here without recursing.
 
@@ -100,6 +101,36 @@ Expected shape:
 }
 ```
 
+### `/.well-known/api-catalog`
+
+```bash
+# Should be 200 with application/linkset+json
+curl -sI https://templia.art/.well-known/api-catalog | grep -iE 'content-type|link|cache-control'
+
+# Body — three linkset entries (property.json, availability, tzolkin/journey)
+curl -s https://templia.art/.well-known/api-catalog | python3 -m json.tool
+
+# OPTIONS preflight — should be 204 with CORS headers
+curl -sI -X OPTIONS https://templia.art/.well-known/api-catalog | head -5
+```
+
+Expected on GET:
+
+```
+content-type: application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"
+cache-control: public, max-age=3600
+link: </.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"
+```
+
+Validate with the public scanner:
+
+```bash
+curl -s -X POST https://isitagentready.com/api/scan \
+  -H 'Content-Type: application/json' \
+  -d '{"url":"https://templia.art"}' \
+  | python3 -c 'import json,sys;d=json.load(sys.stdin);print(d["checks"]["discovery"]["apiCatalog"])'
+```
+
 ### Markdown negotiation
 
 ```bash
@@ -138,6 +169,14 @@ x-markdown-tokens: <number>
 - `fullDays.length === nights - 1` (0 for a 1-night stay).
 - Purely computational; no upstream fetch. Response is cached `max-age=86400`.
 - Anchor date is `2026-02-10 = 6 Kawoq`, matching `src/lib/tzolkin.ts` so the app and the API agree on every date.
+
+### `/.well-known/api-catalog`
+
+- Static JSON — no upstream fetch; serialized once at module load. Response is cached `max-age=3600`.
+- `Content-Type: application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"` per RFC 9727 §2.
+- `Link: </.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"` on every response so HEAD callers can discover it via header alone.
+- CORS: `Access-Control-Allow-Origin: *`. OPTIONS returns 204.
+- Add new endpoints by editing `API_CATALOG` in `src/index.js` — keep it in sync with `/.well-known/openapi.json` paths.
 
 ### Markdown negotiation
 

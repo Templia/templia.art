@@ -595,6 +595,104 @@ async function handleTzolkinJourney(request) {
 }
 
 // ---------------------------------------------------------------------------
+// /.well-known/api-catalog — RFC 9727 API Catalog (Linkset per RFC 9264)
+// ---------------------------------------------------------------------------
+//
+// Publishes a machine-readable index of the public APIs on this origin so that
+// agents can discover them without scraping HTML. Each linkset entry anchors
+// one API endpoint and points to the OpenAPI description (`service-desc`) and
+// the documentation (`service-doc`).
+//
+// Spec: https://www.rfc-editor.org/rfc/rfc9727  (api-catalog well-known URI)
+//       https://www.rfc-editor.org/rfc/rfc9264  (application/linkset+json)
+
+const API_CATALOG = {
+  linkset: [
+    {
+      anchor: "https://templia.art/api/property.json",
+      "service-desc": [
+        {
+          href: "https://templia.art/.well-known/openapi.json",
+          type: "application/json",
+        },
+      ],
+      "service-doc": [
+        {
+          href: "https://templia.art/llms.txt",
+          type: "text/plain",
+        },
+      ],
+    },
+    {
+      anchor: "https://templia.art/api/availability",
+      "service-desc": [
+        {
+          href: "https://templia.art/.well-known/openapi.json",
+          type: "application/json",
+        },
+      ],
+      "service-doc": [
+        {
+          href: "https://templia.art/llms.txt",
+          type: "text/plain",
+        },
+      ],
+    },
+    {
+      anchor: "https://templia.art/api/tzolkin/journey",
+      "service-desc": [
+        {
+          href: "https://templia.art/.well-known/openapi.json",
+          type: "application/json",
+        },
+      ],
+      "service-doc": [
+        {
+          href: "https://templia.art/llms.txt",
+          type: "text/plain",
+        },
+      ],
+    },
+  ],
+};
+
+const API_CATALOG_BODY = JSON.stringify(API_CATALOG, null, 2);
+
+function apiCatalogHeaders() {
+  return {
+    "Content-Type":
+      'application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"',
+    "Cache-Control": "public, max-age=3600",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+    "Access-Control-Allow-Headers": "Accept",
+    // Self-reference so HEAD callers can discover the catalog via Link header
+    // alone (per RFC 9727 §2).
+    Link: '</.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"',
+  };
+}
+
+function handleApiCatalog(request) {
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      status: 204,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+        "Access-Control-Allow-Headers": "Accept",
+      },
+    });
+  }
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    return errorResponse("method_not_allowed", "Use GET or HEAD.", 405);
+  }
+  return new Response(request.method === "HEAD" ? null : API_CATALOG_BODY, {
+    status: 200,
+    headers: apiCatalogHeaders(),
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Router
 // ---------------------------------------------------------------------------
 
@@ -605,6 +703,9 @@ function route(request) {
   }
   if (pathname === "/api/tzolkin/journey" || pathname === "/api/tzolkin/journey/") {
     return handleTzolkinJourney;
+  }
+  if (pathname === "/.well-known/api-catalog" || pathname === "/.well-known/api-catalog/") {
+    return handleApiCatalog;
   }
   return handleMarkdownOrPassthrough;
 }
