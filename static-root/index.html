@@ -320,5 +320,101 @@
         >
             <i class="fab fa-instagram"></i>
         </a>
+        <script>
+        (function () {
+          if (!navigator.modelContext) return;
+          var mc = navigator.modelContext;
+          var controller = new AbortController();
+          var signal = controller.signal;
+          var BOOKING_URL = "https://stay.templia.art";
+          var DATE = { type: "string", format: "date", description: "ISO date YYYY-MM-DD" };
+          function fetchJson(path, params) {
+            var u = new URL(path, location.origin);
+            if (params) Object.keys(params).forEach(function (k) {
+              if (params[k]) u.searchParams.set(k, params[k]);
+            });
+            return fetch(u.toString(), { headers: { Accept: "application/json" } })
+              .then(function (r) {
+                if (!r.ok) throw new Error(path + " -> " + r.status + " " + r.statusText);
+                return r.json();
+              });
+          }
+          var tools = [
+            {
+              name: "check_availability",
+              title: "Check availability at Templia",
+              description: "Check whether Templia is available for a given stay window. Returns JSON with 'available', 'nights', 'minNights', 'blockedRanges', and 'bookingUrl'. Source is the Airbnb-synced iCal feed; calendar lag is possible — always confirm on the booking page before committing.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  from: Object.assign({}, DATE, { description: "Arrival (YYYY-MM-DD)." }),
+                  to: Object.assign({}, DATE, { description: "Departure (YYYY-MM-DD, exclusive)." })
+                },
+                additionalProperties: false
+              },
+              annotations: { readOnlyHint: true },
+              execute: function (input) {
+                var a = input || {};
+                return fetchJson("/api/availability", { from: a.from || "", to: a.to || "" });
+              }
+            },
+            {
+              name: "get_property_info",
+              title: "Get property information",
+              description: "Return canonical information about Templia: name, location, description, amenities, pricing signals, policies, booking URL, contact, and images.",
+              inputSchema: { type: "object", properties: {}, additionalProperties: false },
+              annotations: { readOnlyHint: true },
+              execute: function () { return fetchJson("/api/property.json"); }
+            },
+            {
+              name: "get_tzolkin_reading",
+              title: "Get Tzolk'in reading for a stay window",
+              description: "Return the Tzolk'in (Maya sacred calendar) day-sign and tone for arrival, each full day, and departure of a stay window. Deterministic from anchor 2026-02-10 = 6 Kawoq. Window capped at 60 days.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  from: Object.assign({}, DATE, { description: "Arrival (YYYY-MM-DD)." }),
+                  to: Object.assign({}, DATE, { description: "Departure (YYYY-MM-DD, exclusive)." })
+                },
+                additionalProperties: false
+              },
+              annotations: { readOnlyHint: true },
+              execute: function (input) {
+                var a = input || {};
+                return fetchJson("/api/tzolkin/journey", { from: a.from || "", to: a.to || "" });
+              }
+            },
+            {
+              name: "open_booking_page",
+              title: "Open booking page",
+              description: "Open Templia's booking page (stay.templia.art) in the current tab, optionally with arrival and departure dates prefilled. Full-page navigation — only call when the user has confirmed intent to book.",
+              inputSchema: {
+                type: "object",
+                properties: {
+                  from: Object.assign({}, DATE, { description: "Prefilled arrival date." }),
+                  to: Object.assign({}, DATE, { description: "Prefilled departure date." })
+                },
+                additionalProperties: false
+              },
+              annotations: { readOnlyHint: false },
+              execute: function (input) {
+                var a = input || {};
+                var url = new URL(BOOKING_URL);
+                if (a.from) url.searchParams.set("from", a.from);
+                if (a.to) url.searchParams.set("to", a.to);
+                location.href = url.toString();
+                return Promise.resolve({ navigatedTo: url.toString() });
+              }
+            }
+          ];
+          tools.forEach(function (tool) {
+            try {
+              mc.registerTool(tool, { signal: signal });
+            } catch (e) {
+              if (window.console) console.warn("WebMCP: " + tool.name + ":", e);
+            }
+          });
+        })();
+        </script>
     </body>
 </html>
