@@ -47,7 +47,7 @@ export const UI_STRINGS: Record<Locale, {
     nawalTone: "Tone",
     nawalElement: "Element",
     nawalDirection: "Direction",
-    defaultWelcome: "You have arrived at Templia at a meaningful moment in your journey, {name}. It is not a coincidence. The Maya understood that every day carries its own living energy \u2014 and the days of your stay were chosen long before you were.\n\nWhat follows is a guide to the energies present during your time at Templia \u2014 a map of the influences, symbols, and intentions that accompany you while you are in the land of the Maya.",
+    defaultWelcome: "Your time at Templia begins at a meaningful moment in your journey, {name}. It is not a coincidence. The Maya understood that every day carries its own living energy \u2014 and the days of your stay were chosen long before you were.\n\nWhat follows is a guide to the energies present during your time at Templia \u2014 a map of the influences, symbols, and intentions that accompany you while you are in the land of the Maya.",
     nights: "nights",
     activities: "Explore {day}'s activities",
   },
