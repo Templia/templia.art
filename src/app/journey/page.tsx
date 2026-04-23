@@ -42,7 +42,15 @@ function JourneyRedirector() {
       return;
     }
 
-    window.location.replace(`/journey/${checkin}-to-${checkout}/`);
+    const guest = searchParams.get("guest");
+    const firstName = guest
+      ? guest.split(/[\s,&+]/)[0].trim().toLowerCase().replace(/[^a-z0-9]/g, "")
+      : "";
+    const slug = firstName
+      ? `${checkin}-to-${checkout}-${firstName}`
+      : `${checkin}-to-${checkout}`;
+
+    window.location.replace(`/journey/${slug}/`);
   }, [searchParams]);
 
   return (

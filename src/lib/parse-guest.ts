@@ -316,6 +316,10 @@ export function parseGuestFile(filename: string): { slug: string; journey: Guest
   return { slug, journey };
 }
 
+export function guestNameSlug(name: string): string {
+  return name.split(/[\s,&]/)[0].trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
 export function loadAllGuests(): Record<string, GuestJourney> {
   const journeys: Record<string, GuestJourney> = {};
 
@@ -325,12 +329,25 @@ export function loadAllGuests(): Record<string, GuestJourney> {
     (f) => f.endsWith(".md") && !f.startsWith("_")
   );
 
+  const parsed: { slug: string; journey: GuestJourney }[] = [];
+  const baseSlugCount: Record<string, number> = {};
+
   for (const file of files) {
     try {
-      const { slug, journey } = parseGuestFile(file);
-      journeys[slug] = journey;
+      const result = parseGuestFile(file);
+      parsed.push(result);
+      baseSlugCount[result.slug] = (baseSlugCount[result.slug] || 0) + 1;
     } catch (e) {
       console.error(`Error parsing guest file ${file}:`, e);
+    }
+  }
+
+  for (const { slug, journey } of parsed) {
+    if (baseSlugCount[slug] > 1 && journey.guestName) {
+      const suffix = guestNameSlug(journey.guestName);
+      journeys[`${slug}-${suffix}`] = journey;
+    } else {
+      journeys[slug] = journey;
     }
   }
 

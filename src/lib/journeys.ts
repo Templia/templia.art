@@ -216,9 +216,25 @@ const HARDCODED_JOURNEYS: Record<string, GuestJourney> = {
 const JOURNEYS: Record<string, GuestJourney> = { ...HARDCODED_JOURNEYS, ...GUEST_JOURNEYS };
 
 export function getJourneyBySlug(slug: string): GuestJourney | undefined {
-  return JOURNEYS[slug];
+  if (JOURNEYS[slug]) return JOURNEYS[slug];
+  // Fallback: visitor used a guest-suffix URL but the journey isn't a collision case
+  const m = slug.match(/^(\d{4}-\d{2}-\d{2}-to-\d{4}-\d{2}-\d{2})-[a-z0-9]+$/);
+  if (m) return JOURNEYS[m[1]];
+  return undefined;
 }
 
 export function getAllJourneySlugs(): string[] {
-  return Object.keys(JOURNEYS);
+  const slugs = new Set<string>(Object.keys(JOURNEYS));
+  // Also expose guest-suffix slugs for non-colliding journeys so static generation includes them
+  for (const slug of Object.keys(JOURNEYS)) {
+    if (/^\d{4}-\d{2}-\d{2}-to-\d{4}-\d{2}-\d{2}$/.test(slug)) {
+      const journey = JOURNEYS[slug];
+      const name = journey.guestName;
+      if (name) {
+        const suffix = name.split(/[\s,&]/)[0].trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (suffix) slugs.add(`${slug}-${suffix}`);
+      }
+    }
+  }
+  return [...slugs];
 }
