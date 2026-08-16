@@ -1,0 +1,11 @@
+{
+  "name": "Templia",
+  "domain": "templia.art",
+  "agents": [
+    {
+      "name": "Templia",
+      "protocol": "a2a",
+      "url": "https://templia.art/agents/a2a"
+    }
+  ]
+}
