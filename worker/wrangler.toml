@@ -33,5 +33,5 @@ EMAIL_FROM = "Aluxes of Templia <journey@templia.art>"
 [[d1_databases]]
 binding = "DB"
 database_name = "templia-subscriptions"
-database_id = "REPLACE_AFTER_D1_CREATE"
+database_id = "ca0b5465-d54b-4c66-89ce-c13fe27ce167"
 migrations_dir = "migrations"
