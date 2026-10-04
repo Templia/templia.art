@@ -34,12 +34,14 @@ export const UI_STRINGS: Record<Locale, {
   emailPlaceholder: string;
   emailSubmit: string;
   emailSending: string;
-  emailCheckInbox: string;
+  emailSubscribed: string;
+  emailSubscribedToday: string;
+  emailTooEarly: string;
+  emailJourneyFull: string;
   emailAlreadyActive: string;
   emailInvalid: string;
   emailError: string;
   emailPrivacy: string;
-  subscribedBanner: string;
   unsubscribedBanner: string;
   remindMe: string;
   calendarTitle: string;
@@ -80,12 +82,14 @@ export const UI_STRINGS: Record<Locale, {
     emailPlaceholder: "Your email",
     emailSubmit: "Send me each day",
     emailSending: "Sending…",
-    emailCheckInbox: "Almost there — check your inbox and tap the confirmation link.",
+    emailSubscribed: "You're in. The Aluxes have sent you a welcome; each day's message arrives at 7:00 AM.",
+    emailSubscribedToday: "You're in. Today's message is already on its way; the next one arrives tomorrow at 7:00 AM.",
+    emailTooEarly: "Daily messages open two weeks before your arrival — come back closer to your stay.",
+    emailJourneyFull: "This journey already has the maximum number of email addresses.",
     emailAlreadyActive: "You're already subscribed. Your next message arrives at 7:00 AM.",
     emailInvalid: "Please enter a valid email address.",
     emailError: "Something went wrong. Please try again in a moment.",
     emailPrivacy: "Used only for these daily messages, and deleted a week after your stay.",
-    subscribedBanner: "You're subscribed — each day's message arrives at 7:00 AM Tulum time.",
     unsubscribedBanner: "You've been unsubscribed and won't receive more daily emails.",
     remindMe: "Remind me",
     calendarTitle: "Add to your calendar",
@@ -126,12 +130,14 @@ export const UI_STRINGS: Record<Locale, {
     emailPlaceholder: "Tu correo",
     emailSubmit: "Envíenme cada día",
     emailSending: "Enviando…",
-    emailCheckInbox: "Casi listo — revisa tu correo y toca el enlace de confirmación.",
+    emailSubscribed: "Listo. Los Aluxes te enviaron una bienvenida; el mensaje de cada día llega a las 7:00 AM.",
+    emailSubscribedToday: "Listo. El mensaje de hoy ya va en camino; el siguiente llega mañana a las 7:00 AM.",
+    emailTooEarly: "Los mensajes diarios se abren dos semanas antes de tu llegada — vuelve más cerca de tu estadía.",
+    emailJourneyFull: "Este viaje ya tiene el número máximo de correos.",
     emailAlreadyActive: "Ya estás suscrito. Tu próximo mensaje llega a las 7:00 AM.",
     emailInvalid: "Escribe un correo válido, por favor.",
     emailError: "Algo salió mal. Inténtalo de nuevo en un momento.",
     emailPrivacy: "Solo se usa para estos mensajes diarios y se borra una semana después de tu estadía.",
-    subscribedBanner: "Suscripción confirmada — el mensaje de cada día llega a las 7:00 AM hora de Tulum.",
     unsubscribedBanner: "Cancelaste la suscripción y no recibirás más correos diarios.",
     remindMe: "Recuérdamelo",
     calendarTitle: "Agregar a tu calendario",

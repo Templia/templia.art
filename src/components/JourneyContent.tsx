@@ -259,11 +259,11 @@ export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug:
         </section>
       )}
 
-      {/* ═══ SUBSCRIBE / UNSUBSCRIBE CONFIRMATION BANNER ═══ */}
-      {(searchParams.get("subscribed") === "1" || searchParams.get("unsubscribed") === "1") && (
+      {/* ═══ UNSUBSCRIBE CONFIRMATION BANNER ═══ */}
+      {searchParams.get("unsubscribed") === "1" && (
         <section className="relative px-6 pb-4 max-w-2xl mx-auto">
           <p role="status" className="text-center text-sm text-foreground/90 border border-gold/40 rounded-full px-5 py-3">
-            {searchParams.get("subscribed") === "1" ? ui.subscribedBanner : ui.unsubscribedBanner}
+            {ui.unsubscribedBanner}
           </p>
         </section>
       )}

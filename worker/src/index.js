@@ -16,7 +16,7 @@
 //
 // New endpoints get a new `handle*` function plus a branch in `route()`.
 
-import { handleSubscribe, handleConfirm, handleUnsubscribe, sendDailyEmails } from "./subscriptions.js";
+import { handleSubscribe, handleUnsubscribe, sendDailyEmails } from "./subscriptions.js";
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -1061,9 +1061,6 @@ function route(request) {
   }
   if (pathname === "/api/subscribe" || pathname === "/api/subscribe/") {
     return handleSubscribe;
-  }
-  if (pathname === "/api/subscribe/confirm" || pathname === "/api/subscribe/confirm/") {
-    return handleConfirm;
   }
   if (pathname === "/api/unsubscribe" || pathname === "/api/unsubscribe/") {
     return handleUnsubscribe;

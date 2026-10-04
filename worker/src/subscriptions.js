@@ -1,7 +1,7 @@
 // Daily journey emails.
 //
-//   POST /api/subscribe            { slug, email, locale }  → sends a confirmation email
-//   GET  /api/subscribe/confirm    ?token=…                 → activates, redirects to the journey
+//   POST /api/subscribe            { slug, email, locale }  → subscribes and sends a welcome
+//                                                           (or today's message, mid-stay)
 //   GET  /api/unsubscribe          ?token=…                 → unsubscribes, redirects to the journey
 //   POST /api/unsubscribe          ?token=…                 → RFC 8058 one-click unsubscribe
 //   scheduled()                                             → 12:00 UTC = 07:00 Tulum, sends today's day
@@ -13,7 +13,10 @@
 const TULUM_OFFSET_HOURS = -5; // Quintana Roo stays on UTC-5 all year
 const SLUG_RE = /^\d{4}-\d{2}-\d{2}-to-\d{4}-\d{2}-\d{2}(-[a-z0-9]+)?$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const RESEND_WINDOW_MS = 10 * 60 * 1000;
+const MAX_EMAILS_PER_JOURNEY = 4;
+// After this hour (Tulum), a mid-stay signup starts tomorrow instead of getting a "good morning" at night.
+const LATE_SIGNUP_HOUR = 18;
+const SIGNUP_OPENS_DAYS_BEFORE = 14;
 const RETENTION_DAYS_AFTER_CHECKOUT = 7;
 const ALLOWED_ORIGINS = ["https://templia.art", "http://localhost:3000"];
 
@@ -23,6 +26,16 @@ const ALLOWED_ORIGINS = ["https://templia.art", "http://localhost:3000"];
 
 export function tulumToday(now = new Date()) {
   return new Date(now.getTime() + TULUM_OFFSET_HOURS * 3600e3).toISOString().slice(0, 10);
+}
+
+function tulumHour(now) {
+  return new Date(now.getTime() + TULUM_OFFSET_HOURS * 3600e3).getUTCHours();
+}
+
+// Local testing only: wrangler dev sets TEST_CLOCK=1, so an X-Test-Now header can fake the time.
+function requestNow(request, env) {
+  const fake = env.TEST_CLOCK === "1" && request.headers.get("X-Test-Now");
+  return fake ? new Date(fake) : new Date();
 }
 
 function addDaysIso(iso, n) {
@@ -108,13 +121,14 @@ async function sendEmail(env, { to, subject, html, text, unsubscribeUrl }) {
 const COPY = {
   en: {
     signature: "The Aluxes of Templia",
-    confirmSubject: "A message from the Aluxes of Templia",
-    confirmIntro: (name) =>
+    welcomeSubject: "Welcome from the Aluxes of Templia",
+    welcomeIntro: (name) =>
       `${name ? `Hello, ${name}. ` : ""}We are the Aluxes of Templia — the small guardians who, in Maya tradition, watch over this land and everyone who stays on it.`,
-    confirmAsk: (from, to) =>
-      `You asked us to bring you each day's message during your stay, ${from} to ${to}. We'll leave it for you every morning at 7:00, Tulum time. Tap below so we know it was really you.`,
-    confirmButton: "Yes, bring me each day",
-    confirmIgnore: "If you didn't ask for this, simply ignore this note and we'll stay quiet.",
+    welcomeBody: (from, to) =>
+      `From the morning of ${from} until ${to}, we'll leave you each day's message at 7:00, Tulum time. Until then, rest well — we're already looking after the place.`,
+    welcomeBodyTomorrow: (to) =>
+      `Starting tomorrow morning, and every morning until ${to}, we'll leave you each day's message at 7:00, Tulum time. Tonight, rest well — we're looking after the place.`,
+    notYou: "Not you, or changed your mind?",
     greetingFirst: (name, tz) =>
       `Good morning${name ? `, ${name}` : ""}. We are the Aluxes of Templia, the small keepers of this land. We were awake before the sun, as always, and today has a name: ${tz}.`,
     greetings: [
@@ -139,13 +153,14 @@ const COPY = {
   },
   es: {
     signature: "Los Aluxes de Templia",
-    confirmSubject: "Un mensaje de los Aluxes de Templia",
-    confirmIntro: (name) =>
+    welcomeSubject: "Bienvenida de los Aluxes de Templia",
+    welcomeIntro: (name) =>
       `${name ? `Hola, ${name}. ` : ""}Somos los Aluxes de Templia — los pequeños guardianes que, en la tradición maya, cuidan esta tierra y a todos los que se quedan en ella.`,
-    confirmAsk: (from, to) =>
-      `Nos pediste traerte el mensaje de cada día durante tu estadía, del ${from} al ${to}. Te lo dejaremos cada mañana a las 7:00, hora de Tulum. Toca abajo para saber que fuiste tú.`,
-    confirmButton: "Sí, tráiganme cada día",
-    confirmIgnore: "Si no lo pediste, ignora esta nota y nos quedaremos en silencio.",
+    welcomeBody: (from, to) =>
+      `Desde la mañana del ${from} hasta el ${to}, te dejaremos el mensaje de cada día a las 7:00, hora de Tulum. Mientras tanto, descansa — ya estamos cuidando el lugar.`,
+    welcomeBodyTomorrow: (to) =>
+      `A partir de mañana por la mañana, y cada mañana hasta el ${to}, te dejaremos el mensaje de cada día a las 7:00, hora de Tulum. Esta noche, descansa — estamos cuidando el lugar.`,
+    notYou: "¿No eres tú, o cambiaste de idea?",
     greetingFirst: (name, tz) =>
       `Buenos días${name ? `, ${name}` : ""}. Somos los Aluxes de Templia, los pequeños guardianes de esta tierra. Despertamos antes que el sol, como siempre, y hoy tiene nombre: ${tz}.`,
     greetings: [
@@ -194,28 +209,30 @@ function signatureRow(c, signoff) {
 <tr><td style="padding-top:10px;font-size:18px;color:#c9a84c;">— ${escapeHtml(c.signature)}</td></tr>`;
 }
 
-export function renderConfirmEmail(env, digest, locale, confirmUrl) {
+export function renderWelcomeEmail(env, digest, locale, unsubscribeUrl, { fromTomorrow = false } = {}) {
   const c = COPY[locale] ?? COPY.en;
-  const intro = c.confirmIntro(digest.guestName);
-  const ask = c.confirmAsk(formatLongDate(digest.checkIn, locale), formatLongDate(digest.checkOut, locale));
+  const intro = c.welcomeIntro(digest.guestName);
+  const body = fromTomorrow
+    ? c.welcomeBodyTomorrow(formatLongDate(digest.checkOut, locale))
+    : c.welcomeBody(formatLongDate(digest.checkIn, locale), formatLongDate(digest.checkOut, locale));
   const html = layout(
     `<tr><td style="font-size:19px;line-height:1.6;">${escapeHtml(intro)}</td></tr>
-<tr><td style="padding-top:16px;font-size:19px;line-height:1.6;">${escapeHtml(ask)}</td></tr>
-${button(confirmUrl, c.confirmButton)}
-<tr><td style="padding-top:20px;font-size:17px;color:#c9a84c;">— ${escapeHtml(c.signature)}</td></tr>
-<tr><td align="center" style="padding-top:24px;font-family:${SANS};font-size:13px;color:#9a9a9a;">${escapeHtml(c.confirmIgnore)}</td></tr>`,
+<tr><td style="padding-top:16px;font-size:19px;line-height:1.6;">${escapeHtml(body)}</td></tr>
+<tr><td style="padding-top:24px;font-size:18px;color:#c9a84c;">— ${escapeHtml(c.signature)}</td></tr>`,
+    `<tr><td align="center" style="padding-top:32px;font-family:${SANS};font-size:12px;line-height:1.6;color:#8a8a8a;">${escapeHtml(c.notYou)} <a href="${escapeHtml(unsubscribeUrl)}" style="color:#8a8a8a;">${escapeHtml(c.unsubscribe)}</a></td></tr>`,
   );
-  const text = `${intro}\n\n${ask}\n\n${c.confirmButton}: ${confirmUrl}\n\n— ${c.signature}\n\n${c.confirmIgnore}`;
-  return { subject: c.confirmSubject, html, text };
+  const text = `${intro}\n\n${body}\n\n— ${c.signature}\n\n${c.notYou} ${c.unsubscribe}: ${unsubscribeUrl}`;
+  return { subject: c.welcomeSubject, html, text };
 }
 
 function aluxVoice(c, digest, day, isFirst) {
   const isLast = day.dayNumber === digest.totalDays;
   const pick = (list) => list[(day.dayNumber - 1) % list.length];
-  const greeting = isLast
-    ? c.greetingLast(digest.guestName, day.tzolkin)
-    : isFirst
-      ? c.greetingFirst(digest.guestName, day.tzolkin)
+  // A guest's first email always introduces the Aluxes, even on the last morning.
+  const greeting = isFirst
+    ? c.greetingFirst(digest.guestName, day.tzolkin)
+    : isLast
+      ? c.greetingLast(digest.guestName, day.tzolkin)
       : pick(c.greetings)(digest.guestName, day.tzolkin);
   const signoff = isLast ? c.signoffLast : pick(c.signoffs);
   return { greeting, signoff };
@@ -278,11 +295,11 @@ function pickDay(digest, locale, date) {
   return days.find((d) => d.date === date) ?? null;
 }
 
-async function sendDayToRow(env, row, digest, today) {
+async function sendDayToRow(env, row, digest, today, { isFirst = false } = {}) {
   const day = pickDay(digest, row.locale, today);
   if (!day) return false;
   const unsubscribeUrl = `${siteBase(env)}/api/unsubscribe?token=${row.token}`;
-  const email = renderDailyEmail(env, digest, day, row.locale, unsubscribeUrl, { isFirst: !row.last_sent_date });
+  const email = renderDailyEmail(env, digest, day, row.locale, unsubscribeUrl, { isFirst });
   await sendEmail(env, { to: row.email, ...email, unsubscribeUrl });
   await env.DB.prepare("UPDATE subscriptions SET last_sent_date = ? WHERE token = ?").bind(today, row.token).run();
   return true;
@@ -312,57 +329,48 @@ export async function handleSubscribe(request, env) {
 
   const digest = await fetchDigest(env, slug);
   if (!digest) return json(request, { error: "journey_not_found" }, 404);
-  if (digest.checkOut < tulumToday()) return json(request, { error: "stay_ended" }, 410);
+  const now = requestNow(request, env);
+  const today = tulumToday(now);
+  const late = tulumHour(now) >= LATE_SIGNUP_HOUR;
+  if (digest.checkOut < today || (digest.checkOut === today && late)) return json(request, { error: "stay_ended" }, 410);
 
-  const existing = await env.DB.prepare("SELECT * FROM subscriptions WHERE slug = ? AND email = ?").bind(slug, email).first();
+  if (today < addDaysIso(digest.checkIn, -SIGNUP_OPENS_DAYS_BEFORE)) return json(request, { error: "too_early" }, 409);
+
+  const existing = await env.DB.prepare("SELECT status FROM subscriptions WHERE slug = ? AND email = ?").bind(slug, email).first();
   if (existing?.status === "active") return json(request, { status: "active" });
-  if (existing?.status === "pending" && Date.now() - Date.parse(existing.created_at) < RESEND_WINDOW_MS) {
-    return json(request, { status: "pending" });
-  }
+
+  const { n } = await env.DB.prepare(
+    "SELECT COUNT(*) AS n FROM subscriptions WHERE slug = ? AND status = 'active' AND email <> ?",
+  ).bind(slug, email).first();
+  if (n >= MAX_EMAILS_PER_JOURNEY) return json(request, { error: "journey_full" }, 409);
 
   const token = newToken();
-  const now = new Date().toISOString();
+  const createdAt = now.toISOString();
   await env.DB.prepare(
-    `INSERT INTO subscriptions (token, slug, email, locale, check_in, check_out, status, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, 'pending', ?)
+    `INSERT INTO subscriptions (token, slug, email, locale, check_in, check_out, status, created_at, confirmed_at)
+     VALUES (?, ?, ?, ?, ?, ?, 'active', ?, ?)
      ON CONFLICT (slug, email) DO UPDATE SET
        token = excluded.token, locale = excluded.locale, check_in = excluded.check_in,
-       check_out = excluded.check_out, status = 'pending', created_at = excluded.created_at, confirmed_at = NULL`,
-  ).bind(token, slug, email, locale, digest.checkIn, digest.checkOut, now).run();
+       check_out = excluded.check_out, status = 'active', created_at = excluded.created_at,
+       confirmed_at = excluded.confirmed_at, last_sent_date = NULL`,
+  ).bind(token, slug, email, locale, digest.checkIn, digest.checkOut, createdAt, createdAt).run();
 
-  const confirmUrl = `${siteBase(env)}/api/subscribe/confirm?token=${token}`;
+  // Mid-stay: today's message doubles as the welcome (its greeting introduces the Aluxes).
+  const row = { token, email, locale, last_sent_date: null };
+  const inStay = today >= digest.checkIn && today <= digest.checkOut;
+  const midStay = inStay && !late && pickDay(digest, locale, today);
   try {
-    await sendEmail(env, { to: email, ...renderConfirmEmail(env, digest, locale, confirmUrl) });
+    if (midStay) {
+      await sendDayToRow(env, row, digest, today, { isFirst: true });
+    } else {
+      const unsubscribeUrl = `${siteBase(env)}/api/unsubscribe?token=${token}`;
+      await sendEmail(env, { to: email, ...renderWelcomeEmail(env, digest, locale, unsubscribeUrl, { fromTomorrow: inStay }), unsubscribeUrl });
+    }
   } catch (err) {
-    console.error("confirm email failed", err);
+    console.error("welcome email failed", err);
     return json(request, { error: "email_failed" }, 502);
   }
-  return json(request, { status: "pending" });
-}
-
-export async function handleConfirm(request, env, ctx) {
-  const token = new URL(request.url).searchParams.get("token") ?? "";
-  const row = env.DB && token ? await env.DB.prepare("SELECT * FROM subscriptions WHERE token = ?").bind(token).first() : null;
-  if (!row || row.status === "unsubscribed") return Response.redirect(`${siteBase(env)}/?subscribe=invalid`, 302);
-
-  if (row.status !== "active") {
-    await env.DB.prepare("UPDATE subscriptions SET status = 'active', confirmed_at = ? WHERE token = ?")
-      .bind(new Date().toISOString(), token).run();
-  }
-
-  const digest = await fetchDigest(env, row.slug);
-  if (!digest) return Response.redirect(`${siteBase(env)}/journey/${row.slug}/?subscribed=1`, 302);
-
-  // Confirming mid-stay: send today's message right away instead of waiting for tomorrow.
-  const today = tulumToday();
-  const day = today >= row.check_in && today <= row.check_out ? pickDay(digest, row.locale, today) : null;
-  if (day && row.last_sent_date !== today) {
-    ctx.waitUntil(sendDayToRow(env, row, digest, today).catch((err) => console.error("immediate send failed", err)));
-  }
-
-  const url = new URL(journeyUrl(env, digest, row.locale));
-  url.searchParams.set("subscribed", "1");
-  return Response.redirect(url.toString() + (day ? `#day-${day.dayNumber}` : ""), 302);
+  return json(request, { status: "active", sentToday: Boolean(midStay) });
 }
 
 export async function handleUnsubscribe(request, env) {

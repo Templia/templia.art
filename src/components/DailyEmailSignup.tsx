@@ -8,7 +8,9 @@ import { type Locale, UI_STRINGS } from "@/lib/i18n";
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
 const SYNC_EVENT = "templia:email-subscription";
 
-type State = "idle" | "sending" | "pending" | "active" | "invalid" | "error";
+type State = "idle" | "sending" | "subscribed" | "subscribedToday" | "active" | "invalid" | "tooEarly" | "full" | "error";
+
+const ERROR_STATES: Record<string, State> = { invalid_email: "invalid", too_early: "tooEarly", journey_full: "full" };
 
 function storageKey(slug: string) {
   return `templia:emailSub:${slug}`;
@@ -24,22 +26,19 @@ export function DailyEmailSignup({ slug, locale }: { slug: string; locale: Local
     const read = () => {
       try {
         const saved = window.localStorage.getItem(storageKey(slug));
-        if (saved === "pending" || saved === "active") setState(saved);
+        // Don't overwrite the "you're in" message in the panel that just subscribed.
+        if (saved === "active") setState((prev) => (prev === "subscribed" || prev === "subscribedToday" ? prev : "active"));
       } catch {
         // storage unavailable — form still works, just not remembered
       }
     };
     read();
-    if (new URLSearchParams(window.location.search).get("subscribed") === "1") {
-      try { window.localStorage.setItem(storageKey(slug), "active"); } catch {}
-      setState("active");
-    }
     window.addEventListener(SYNC_EVENT, read);
     return () => window.removeEventListener(SYNC_EVENT, read);
   }, [slug]);
 
-  function remember(s: "pending" | "active") {
-    try { window.localStorage.setItem(storageKey(slug), s); } catch {}
+  function remember() {
+    try { window.localStorage.setItem(storageKey(slug), "active"); } catch {}
     window.dispatchEvent(new Event(SYNC_EVENT));
   }
 
@@ -57,24 +56,36 @@ export function DailyEmailSignup({ slug, locale }: { slug: string; locale: Local
         body: JSON.stringify({ slug, email: email.trim(), locale }),
       });
       const data = await res.json().catch(() => ({}));
-      if (res.ok && (data.status === "pending" || data.status === "active")) {
-        setState(data.status);
-        remember(data.status);
+      if (res.ok && data.status === "active") {
+        setState(data.sentToday ? "subscribedToday" : "subscribed");
+        remember();
       } else {
-        setState(data.error === "invalid_email" ? "invalid" : "error");
+        setState(ERROR_STATES[data.error] ?? "error");
       }
     } catch {
       setState("error");
     }
   }
 
-  if (state === "pending" || state === "active") {
+  const doneMessage =
+    state === "subscribed" ? ui.emailSubscribed
+    : state === "subscribedToday" ? ui.emailSubscribedToday
+    : state === "active" ? ui.emailAlreadyActive
+    : null;
+  if (doneMessage) {
     return (
       <p className="text-sm text-foreground/90 leading-relaxed" role="status">
-        {state === "active" ? ui.emailAlreadyActive : ui.emailCheckInbox}
+        {doneMessage}
       </p>
     );
   }
+
+  const errorMessage =
+    state === "invalid" ? ui.emailInvalid
+    : state === "tooEarly" ? ui.emailTooEarly
+    : state === "full" ? ui.emailJourneyFull
+    : state === "error" ? ui.emailError
+    : null;
 
   return (
     <div>
@@ -88,7 +99,7 @@ export function DailyEmailSignup({ slug, locale }: { slug: string; locale: Local
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
-            if (state === "invalid" || state === "error") setState("idle");
+            if (errorMessage) setState("idle");
           }}
           placeholder={ui.emailPlaceholder}
           aria-label={ui.emailPlaceholder}
@@ -102,9 +113,9 @@ export function DailyEmailSignup({ slug, locale }: { slug: string; locale: Local
           {state === "sending" ? ui.emailSending : ui.emailSubmit}
         </button>
       </form>
-      {(state === "invalid" || state === "error") && (
+      {errorMessage && (
         <p className="mt-2 text-sm text-gold" role="alert">
-          {state === "invalid" ? ui.emailInvalid : ui.emailError}
+          {errorMessage}
         </p>
       )}
       <p className="mt-2 text-xs text-foreground/60">{ui.emailPrivacy}</p>
