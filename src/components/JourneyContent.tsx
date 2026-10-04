@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { type GuestJourney } from "@/lib/journeys";
 import { getTzolkinDate, getGlyphPath, getDaySignByName, type TzolkinDate } from "@/lib/tzolkin";
@@ -13,12 +13,23 @@ function getInitialLocale(searchParams: URLSearchParams): Locale {
   return "en";
 }
 
+function getLocalDateString(d = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${dd}`;
+}
+
 export function JourneyContent({ journey }: { journey: GuestJourney }) {
   const searchParams = useSearchParams();
   const [locale, setLocale] = useState<Locale>(() => getInitialLocale(searchParams));
 
   const [birthdayInput, setBirthdayInput] = useState("");
   const [computedNawal, setComputedNawal] = useState<TzolkinDate | null>(null);
+
+  // Accordion state — initialized post-mount in useEffect to avoid hydration mismatch
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
+  const [welcomeOpen, setWelcomeOpen] = useState(true);
 
   const ui = UI_STRINGS[locale];
   const hasEs = !!journey.es;
@@ -34,7 +45,69 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
 
   const checkInDate = new Date(journey.checkIn + "T12:00:00");
   const checkOutDate = new Date(journey.checkOut + "T12:00:00");
-  const today = new Date().toISOString().split("T")[0];
+
+  // Per-device localStorage key for welcome-seen flag
+  const welcomeKey = `templia:welcomeSeen:${journey.checkIn}:${journey.checkOut}:${journey.guestName ?? ""}`;
+
+  // On mount: pick the day to open (today's day → or #day-N hash → or Day 1),
+  // decide welcome visibility from localStorage, and scroll to hashed day.
+  useEffect(() => {
+    const today = getLocalDateString();
+    let hashIndex: number | null = null;
+    const hashMatch = window.location.hash.match(/^#day-(\d+)$/);
+    if (hashMatch) {
+      const idx = parseInt(hashMatch[1], 10) - 1;
+      if (idx >= 0 && idx < days.length) hashIndex = idx;
+    }
+    let openDate: string | undefined;
+    if (hashIndex !== null) {
+      openDate = days[hashIndex].date;
+    } else {
+      const match = days.find((d) => d.date === today);
+      openDate = match?.date ?? days[0]?.date;
+    }
+    if (openDate) setExpandedDays(new Set([openDate]));
+
+    // Welcome: visible on first visit per device, collapsed afterwards
+    try {
+      const seen = window.localStorage.getItem(welcomeKey);
+      if (seen) {
+        setWelcomeOpen(false);
+      } else {
+        window.localStorage.setItem(welcomeKey, "1");
+        setWelcomeOpen(true);
+      }
+    } catch {
+      // Private browsing / storage disabled — leave default (true)
+    }
+
+    if (hashIndex !== null) {
+      setTimeout(() => {
+        const el = document.getElementById(`day-${hashIndex! + 1}`);
+        el?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [journey.checkIn, journey.checkOut, journey.guestName]);
+
+  function toggleDay(date: string) {
+    setExpandedDays((prev) => {
+      const next = new Set(prev);
+      if (next.has(date)) next.delete(date);
+      else next.add(date);
+      return next;
+    });
+  }
+
+  const allExpanded = days.length > 0 && days.every((d) => expandedDays.has(d.date));
+
+  function toggleAllDays() {
+    if (allExpanded) {
+      setExpandedDays(new Set());
+    } else {
+      setExpandedDays(new Set(days.map((d) => d.date)));
+    }
+  }
 
   function getDaySignNameLocalized(englishName: string): string {
     if (locale === "es") return DAY_SIGN_NAMES_ES[englishName] || englishName;
@@ -93,14 +166,37 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
         <div className="mayan-divider w-32 mt-12 animate-fade-in-up animation-delay-800" />
       </section>
 
-      {/* ═══ WELCOME MESSAGE ═══ */}
+      {/* ═══ WELCOME MESSAGE (collapsible, per-device seen flag) ═══ */}
       {welcomeMessage && (
-        <section className="relative px-6 py-16 max-w-2xl mx-auto text-center space-y-6">
-          {welcomeMessage.split("\n\n").map((paragraph, i) => (
-            <p key={i} className="font-[family-name:var(--font-cormorant)] text-xl md:text-2xl leading-relaxed text-foreground/90 italic">
-              {paragraph}
-            </p>
-          ))}
+        <section className="relative px-6 py-10 max-w-2xl mx-auto">
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => setWelcomeOpen((v) => !v)}
+              aria-expanded={welcomeOpen}
+              className="inline-flex items-center gap-3 py-3 px-6 border border-gold/20 rounded-full hover:border-gold/40 transition-colors cursor-pointer"
+            >
+              <svg
+                className={`w-3 h-3 text-gold/50 transition-transform shrink-0 ${welcomeOpen ? "rotate-90" : ""}`}
+                viewBox="0 0 12 12"
+                fill="currentColor"
+              >
+                <path d="M4 2l4 4-4 4z" />
+              </svg>
+              <span className="text-sm tracking-[0.2em] uppercase text-gold/60">
+                {ui.welcomeLabel}
+              </span>
+            </button>
+          </div>
+          {welcomeOpen && (
+            <div className="mt-8 text-center space-y-6">
+              {welcomeMessage.split("\n\n").map((paragraph, i) => (
+                <p key={i} className="font-[family-name:var(--font-cormorant)] text-xl md:text-2xl leading-relaxed text-foreground/90 italic">
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          )}
         </section>
       )}
 
@@ -156,85 +252,113 @@ export function JourneyContent({ journey }: { journey: GuestJourney }) {
         </section>
       )}
 
-      {/* ═══ DAY-BY-DAY ITINERARY ═══ */}
+      {/* ═══ EXPAND-ALL CONTROL ═══ */}
+      {days.length > 1 && (
+        <section className="relative px-6 pt-6 pb-2 max-w-3xl mx-auto">
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={toggleAllDays}
+              className="text-xs tracking-[0.3em] uppercase text-gold/50 hover:text-gold/80 transition-colors cursor-pointer py-2"
+            >
+              {allExpanded ? ui.collapseAllDays : ui.expandAllDays}
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* ═══ DAY-BY-DAY ITINERARY (collapsible per day) ═══ */}
       {days.map((day, dayIndex) => {
         const date = new Date(day.date + "T12:00:00");
         const tzolkin = getTzolkinDate(date);
+        const isOpen = expandedDays.has(day.date);
 
         return (
-          <section key={day.date} className="relative px-6 py-20">
+          <section id={`day-${dayIndex + 1}`} key={day.date} className="relative px-6 py-10 scroll-mt-10">
             <div className="max-w-3xl mx-auto">
-              <div className="mayan-divider-thick w-full mb-16" />
+              <div className="mayan-divider-thick w-full mb-8" />
 
-              <div className="text-center mb-12">
-                <p className="text-2xl md:text-3xl font-bold tracking-[0.3em] uppercase text-gold/70 mb-1">
-                  {ui.day} {dayIndex + 1}
-                </p>
-                <p className="text-xs md:text-sm tracking-[0.3em] md:tracking-[0.5em] uppercase text-gold/50 mb-4">
-                  {formatDateShortLocale(date, locale)}
-                </p>
-
-                <div className="flex flex-col items-center md:flex-row md:items-stretch md:justify-center gap-4 md:gap-2 mb-8">
-                  <img
-                    src={getGlyphPath(tzolkin.daySign)}
-                    alt={tzolkin.daySign.name}
-                    className="w-64 h-64 md:w-96 md:h-96 opacity-70 shrink-0"
-                    style={{ filter: "invert(78%) sepia(30%) saturate(600%) hue-rotate(5deg) brightness(90%)" }}
-                  />
-                  <div className="flex flex-col items-center md:items-start md:justify-between text-center md:text-left md:py-[10%]">
-                    <div>
-                      <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-1">
-                        {tzolkin.tone.number} {tzolkin.daySign.name}
-                      </h2>
-                      <p className="text-lg tracking-[0.15em] uppercase text-foreground/55">
-                        {getDaySignNameLocalized(tzolkin.daySign.englishName)}
-                      </p>
-                    </div>
-                    <div className="flex flex-row md:flex-col gap-2 mt-4 md:mt-0">
-                      {tzolkin.daySign.themes.map((theme) => (
-                        <span
-                          key={theme}
-                          className="text-xs tracking-[0.2em] uppercase px-3 py-1 border border-gold/20 text-gold/60 rounded-full w-fit"
-                        >
-                          {getThemeLocalized(theme)}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <p className="font-[family-name:var(--font-cormorant)] text-2xl italic text-gold/70 mb-6">
-                  {day.title}
-                </p>
-              </div>
-
-              <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-foreground/90 text-center max-w-2xl mx-auto mb-14">
-                {day.description}
-              </p>
-
-              <details open={day.date === today || undefined} className="group max-w-2xl mx-auto">
-                <summary className="cursor-pointer list-none flex items-center justify-center gap-3 py-4 select-none border border-gold/20 rounded-full px-6 hover:border-gold/40 transition-colors">
-                  <svg className="w-3 h-3 text-gold/50 transition-transform group-open:rotate-90 shrink-0" viewBox="0 0 12 12" fill="currentColor">
+              {/* Collapsed header — always visible, acts as toggle */}
+              <button
+                type="button"
+                onClick={() => toggleDay(day.date)}
+                aria-expanded={isOpen}
+                aria-controls={`day-${dayIndex + 1}-content`}
+                className="w-full text-center group cursor-pointer py-2"
+              >
+                <div className="flex items-center justify-center gap-3">
+                  <svg
+                    className={`w-3 h-3 text-gold/50 transition-transform shrink-0 ${isOpen ? "rotate-90" : ""}`}
+                    viewBox="0 0 12 12"
+                    fill="currentColor"
+                  >
                     <path d="M4 2l4 4-4 4z" />
                   </svg>
-                  <span className="text-sm tracking-[0.2em] uppercase text-gold/60">
-                    {ui.activities.replace(/\{day\}/g, date.toLocaleDateString(locale === "es" ? "es-MX" : "en-US", { weekday: "long" }))}
-                  </span>
-                </summary>
-                <div className="space-y-8 mt-4">
-                  {day.activities.map((activity, actIndex) => (
-                    <div key={actIndex} className="relative pl-8 border-l border-gold/15">
-                      <div className="absolute left-0 top-1 w-2 h-2 -translate-x-[5px] rounded-full bg-gold/40" />
-                      <p className="text-sm tracking-[0.3em] uppercase text-gold/50 mb-2">
-                        {activity.timeOfDay}
-                      </p>
-                      <p className="text-foreground/90 leading-relaxed">
-                        {activity.activity}
-                      </p>
-                    </div>
-                  ))}
+                  <p className="text-xl md:text-2xl font-bold tracking-[0.3em] uppercase text-gold/70">
+                    {ui.day} {dayIndex + 1}
+                  </p>
                 </div>
-              </details>
+                <p className="text-xs md:text-sm tracking-[0.3em] md:tracking-[0.5em] uppercase text-gold/50 mt-2">
+                  {formatDateShortLocale(date, locale)} · {tzolkin.tone.number} {tzolkin.daySign.name}
+                </p>
+                <p className="font-[family-name:var(--font-cormorant)] text-xl md:text-2xl italic text-gold/70 mt-3">
+                  {day.title}
+                </p>
+              </button>
+
+              {/* Expanded content */}
+              {isOpen && (
+                <div id={`day-${dayIndex + 1}-content`} className="mt-10">
+                  <div className="text-center mb-12">
+                    <div className="flex flex-col items-center md:flex-row md:items-stretch md:justify-center gap-4 md:gap-2 mb-8">
+                      <img
+                        src={getGlyphPath(tzolkin.daySign)}
+                        alt={tzolkin.daySign.name}
+                        className="w-64 h-64 md:w-96 md:h-96 opacity-70 shrink-0"
+                        style={{ filter: "invert(78%) sepia(30%) saturate(600%) hue-rotate(5deg) brightness(90%)" }}
+                      />
+                      <div className="flex flex-col items-center md:items-start md:justify-between text-center md:text-left md:py-[10%]">
+                        <div>
+                          <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-1">
+                            {tzolkin.tone.number} {tzolkin.daySign.name}
+                          </h2>
+                          <p className="text-lg tracking-[0.15em] uppercase text-foreground/55">
+                            {getDaySignNameLocalized(tzolkin.daySign.englishName)}
+                          </p>
+                        </div>
+                        <div className="flex flex-row md:flex-col gap-2 mt-4 md:mt-0">
+                          {tzolkin.daySign.themes.map((theme) => (
+                            <span
+                              key={theme}
+                              className="text-xs tracking-[0.2em] uppercase px-3 py-1 border border-gold/20 text-gold/60 rounded-full w-fit"
+                            >
+                              {getThemeLocalized(theme)}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-foreground/90 text-center max-w-2xl mx-auto mb-14">
+                    {day.description}
+                  </p>
+
+                  <div className="max-w-2xl mx-auto space-y-8">
+                    {day.activities.map((activity, actIndex) => (
+                      <div key={actIndex} className="relative pl-8 border-l border-gold/15">
+                        <div className="absolute left-0 top-1 w-2 h-2 -translate-x-[5px] rounded-full bg-gold/40" />
+                        <p className="text-sm tracking-[0.3em] uppercase text-gold/50 mb-2">
+                          {activity.timeOfDay}
+                        </p>
+                        <p className="text-foreground/90 leading-relaxed">
+                          {activity.activity}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </section>
         );

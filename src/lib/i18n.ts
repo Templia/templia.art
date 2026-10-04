@@ -25,6 +25,9 @@ export const UI_STRINGS: Record<Locale, {
   defaultWelcome: string;
   nights: string;
   activities: string;
+  welcomeLabel: string;
+  expandAllDays: string;
+  collapseAllDays: string;
 }> = {
   en: {
     yourNawal: "Your Nawal",
@@ -50,6 +53,9 @@ export const UI_STRINGS: Record<Locale, {
     defaultWelcome: "Your time at Templia begins at a meaningful point in your journey, {name}. This is not a coincidence. In Maya tradition, every day holds its own living energy. The days of your stay are not random \u2014 they are part of a deeper pattern that was already unfolding before your arrival.\n\nWhat follows is a guide to the energies present during your time at Templia \u2014 a map of the influences, symbols, and intentions that accompany you while you are in the land of the Maya.",
     nights: "nights",
     activities: "Explore {day}'s activities",
+    welcomeLabel: "Welcome",
+    expandAllDays: "Show all days",
+    collapseAllDays: "Collapse all days",
   },
   es: {
     yourNawal: "Tu Nawal",
@@ -75,6 +81,9 @@ export const UI_STRINGS: Record<Locale, {
     defaultWelcome: "Tu tiempo en Templia comienza en un punto significativo de tu camino, {name}. Esto no es una coincidencia. En la tradici\u00f3n maya, cada d\u00eda sostiene su propia energ\u00eda viva. Los d\u00edas de tu estad\u00eda no son aleatorios \u2014 son parte de un patr\u00f3n m\u00e1s profundo que ya se estaba desplegando antes de tu llegada.\n\nLo que sigue es una gu\u00eda de las energ\u00edas presentes durante tu tiempo en Templia \u2014 un mapa de las influencias, s\u00edmbolos e intenciones que te acompa\u00f1an mientras est\u00e1s en la tierra de los mayas.",
     nights: "noches",
     activities: "Explora las actividades del {day}",
+    welcomeLabel: "Bienvenida",
+    expandAllDays: "Mostrar todos los días",
+    collapseAllDays: "Ocultar todos los días",
   },
 };
 
