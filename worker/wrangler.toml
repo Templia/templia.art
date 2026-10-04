@@ -17,3 +17,21 @@ binding = "AI"
 # Observability — free tier, helps when debugging deploys.
 [observability]
 enabled = true
+
+# Daily journey emails (src/subscriptions.js).
+# 12:00 UTC = 07:00 in Tulum (UTC-5 year-round).
+[triggers]
+crons = ["0 12 * * *"]
+
+[vars]
+SITE_URL = "https://templia.art"
+EMAIL_FROM = "Aluxes of Templia <journey@templia.art>"
+
+# Created with: npx wrangler d1 create templia-subscriptions
+# Schema:       npx wrangler d1 migrations apply templia-subscriptions --remote
+# Secret:       npx wrangler secret put RESEND_API_KEY
+[[d1_databases]]
+binding = "DB"
+database_name = "templia-subscriptions"
+database_id = "REPLACE_AFTER_D1_CREATE"
+migrations_dir = "migrations"

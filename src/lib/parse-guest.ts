@@ -302,11 +302,12 @@ export function parseGuestFile(filename: string): { slug: string; journey: Guest
     recommendations: recsEn,
   };
 
-  // Add Spanish if available
-  if (nawalEs && esDays.length > 0 && integrationData.es) {
+  // Add Spanish if available. Guests without a birthday have no Nawal section,
+  // so fall back to the (undisplayed) English nawal rather than dropping Spanish.
+  if (esDays.length > 0 && integrationData.es) {
     journey.es = {
       welcomeMessage: welcomeEs,
-      nawal: nawalEs,
+      nawal: nawalEs ?? nawalEn,
       days: esDays,
       integration: integrationData.es,
       recommendations: recsEs,

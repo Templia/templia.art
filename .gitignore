@@ -42,3 +42,8 @@ next-env.d.ts
 
 # guest data lives in private repo templia/guests
 guests/
+
+# Worker local secrets and state
+worker/.dev.vars
+worker/.wrangler/
+worker/node_modules/

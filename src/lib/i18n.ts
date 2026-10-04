@@ -28,6 +28,24 @@ export const UI_STRINGS: Record<Locale, {
   welcomeLabel: string;
   expandAllDays: string;
   collapseAllDays: string;
+  today: string;
+  emailTitle: string;
+  emailBody: string;
+  emailPlaceholder: string;
+  emailSubmit: string;
+  emailSending: string;
+  emailCheckInbox: string;
+  emailAlreadyActive: string;
+  emailInvalid: string;
+  emailError: string;
+  emailPrivacy: string;
+  subscribedBanner: string;
+  unsubscribedBanner: string;
+  remindMe: string;
+  calendarTitle: string;
+  calendarBody: string;
+  calendarThisDay: string;
+  calendarAllDays: string;
 }> = {
   en: {
     yourNawal: "Your Nawal",
@@ -56,6 +74,24 @@ export const UI_STRINGS: Record<Locale, {
     welcomeLabel: "Welcome",
     expandAllDays: "Show all days",
     collapseAllDays: "Collapse all days",
+    today: "Today",
+    emailTitle: "Email each morning",
+    emailBody: "Each morning at 7:00 (Tulum time) we'll send that day's Tzolkin energy and one suggestion, from your first day to your last.",
+    emailPlaceholder: "Your email",
+    emailSubmit: "Send me each day",
+    emailSending: "Sending…",
+    emailCheckInbox: "Almost there — check your inbox and tap the confirmation link.",
+    emailAlreadyActive: "You're already subscribed. Your next message arrives at 7:00 AM.",
+    emailInvalid: "Please enter a valid email address.",
+    emailError: "Something went wrong. Please try again in a moment.",
+    emailPrivacy: "Used only for these daily messages, and deleted a week after your stay.",
+    subscribedBanner: "You're subscribed — each day's message arrives at 7:00 AM Tulum time.",
+    unsubscribedBanner: "You've been unsubscribed and won't receive more daily emails.",
+    remindMe: "Remind me",
+    calendarTitle: "Add to your calendar",
+    calendarBody: "A 7:00 AM reminder with the day's energy and a link back here.",
+    calendarThisDay: "This day",
+    calendarAllDays: "All {n} days",
   },
   es: {
     yourNawal: "Tu Nawal",
@@ -84,6 +120,24 @@ export const UI_STRINGS: Record<Locale, {
     welcomeLabel: "Bienvenida",
     expandAllDays: "Mostrar todos los días",
     collapseAllDays: "Ocultar todos los días",
+    today: "Hoy",
+    emailTitle: "Correo cada mañana",
+    emailBody: "Cada mañana a las 7:00 (hora de Tulum) te enviaremos la energía del Tzolkin del día y una sugerencia, desde tu primer día hasta el último.",
+    emailPlaceholder: "Tu correo",
+    emailSubmit: "Envíenme cada día",
+    emailSending: "Enviando…",
+    emailCheckInbox: "Casi listo — revisa tu correo y toca el enlace de confirmación.",
+    emailAlreadyActive: "Ya estás suscrito. Tu próximo mensaje llega a las 7:00 AM.",
+    emailInvalid: "Escribe un correo válido, por favor.",
+    emailError: "Algo salió mal. Inténtalo de nuevo en un momento.",
+    emailPrivacy: "Solo se usa para estos mensajes diarios y se borra una semana después de tu estadía.",
+    subscribedBanner: "Suscripción confirmada — el mensaje de cada día llega a las 7:00 AM hora de Tulum.",
+    unsubscribedBanner: "Cancelaste la suscripción y no recibirás más correos diarios.",
+    remindMe: "Recuérdamelo",
+    calendarTitle: "Agregar a tu calendario",
+    calendarBody: "Un recordatorio a las 7:00 AM con la energía del día y un enlace de regreso aquí.",
+    calendarThisDay: "Este día",
+    calendarAllDays: "Los {n} días",
   },
 };
 

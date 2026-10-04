@@ -98,7 +98,7 @@ export default async function JourneyPage({ params }: { params: Promise<{ slug: 
     <>
       <JourneyJsonLd journey={journey} />
       <Suspense>
-        <JourneyContent journey={journey} />
+        <JourneyContent journey={journey} slug={slug} />
       </Suspense>
     </>
   );

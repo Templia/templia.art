@@ -16,6 +16,8 @@
 //
 // New endpoints get a new `handle*` function plus a branch in `route()`.
 
+import { handleSubscribe, handleConfirm, handleUnsubscribe, sendDailyEmails } from "./subscriptions.js";
+
 // ---------------------------------------------------------------------------
 // Shared helpers
 // ---------------------------------------------------------------------------
@@ -1057,6 +1059,15 @@ function route(request) {
   ) {
     return handleMcpServerCard;
   }
+  if (pathname === "/api/subscribe" || pathname === "/api/subscribe/") {
+    return handleSubscribe;
+  }
+  if (pathname === "/api/subscribe/confirm" || pathname === "/api/subscribe/confirm/") {
+    return handleConfirm;
+  }
+  if (pathname === "/api/unsubscribe" || pathname === "/api/unsubscribe/") {
+    return handleUnsubscribe;
+  }
   return handleMarkdownOrPassthrough;
 }
 
@@ -1064,5 +1075,8 @@ export default {
   async fetch(request, env, ctx) {
     const handler = route(request);
     return handler(request, env, ctx);
+  },
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(sendDailyEmails(env, new Date(event.scheduledTime)));
   },
 };
