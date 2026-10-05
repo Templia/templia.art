@@ -392,7 +392,8 @@ export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug:
         );
       })}
 
-      {/* ═══ INTEGRATION SECTION ═══ */}
+      {/* ═══ INTEGRATION SECTION (a look back over the stay — revealed from checkout day) ═══ */}
+      {todayStr && todayStr >= journey.checkOut && (
       <section className="relative px-6 py-24 max-w-3xl mx-auto">
         <div className="mayan-divider-thick w-full mb-16" />
 
@@ -437,6 +438,7 @@ export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug:
           </p>
         </div>
       </section>
+      )}
 
       {/* ═══ NAWAL CTA SECTION (only if no birthday) ═══ */}
       {!hasBirthday && (
