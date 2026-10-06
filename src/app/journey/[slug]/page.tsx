@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
 import { getJourneyBySlug, getAllJourneySlugs } from "@/lib/journeys";
 import { formatDateShort } from "@/lib/tzolkin";
@@ -67,18 +66,42 @@ function JourneyJsonLd({ journey }: { journey: ReturnType<typeof getJourneyBySlu
       })),
     },
     provider: {
-      "@type": "LodgingBusiness",
-      name: journey.locationName,
-      url: "https://templia.art",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: "Tulum",
-        addressRegion: "Quintana Roo",
-        addressCountry: "MX",
-      },
+      "@id": "https://templia.art/#lodging",
     },
     startDate: checkIn.toISOString().split("T")[0],
     endDate: checkOut.toISOString().split("T")[0],
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "h2", ".journey-description"],
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  );
+}
+
+function BreadcrumbJsonLd({ slug, journey }: { slug: string; journey: NonNullable<ReturnType<typeof getJourneyBySlug>> }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Templia Art",
+        item: "https://templia.art/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: `Tzolkin Journey: ${journey.locationName}`,
+        item: `https://templia.art/journey/${slug}/`,
+      },
+    ],
   };
 
   return (
@@ -97,9 +120,8 @@ export default async function JourneyPage({ params }: { params: Promise<{ slug: 
   return (
     <>
       <JourneyJsonLd journey={journey} />
-      <Suspense>
-        <JourneyContent journey={journey} slug={slug} />
-      </Suspense>
+      <BreadcrumbJsonLd slug={slug} journey={journey} />
+      <JourneyContent journey={journey} slug={slug} />
     </>
   );
 }

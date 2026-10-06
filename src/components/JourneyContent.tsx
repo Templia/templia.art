@@ -1,18 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { type GuestJourney } from "@/lib/journeys";
-import { getTzolkinDate, getGlyphPath, getDaySignByName, type TzolkinDate } from "@/lib/tzolkin";
-import { type Locale, UI_STRINGS, DAY_SIGN_NAMES_ES, THEMES_ES, formatDateShortLocale, formatDateShortMobileLocale, formatStayRange } from "@/lib/i18n";
+import { getTzolkinDate, getGlyphPath, getDaySignByName } from "@/lib/tzolkin";
+import { type Locale, UI_STRINGS, DAY_SIGN_NAMES_ES, THEMES_ES, formatDateShortLocale, formatStayRange } from "@/lib/i18n";
 import { LanguageToggle } from "./LanguageToggle";
 import { RemindMe } from "./RemindMe";
-
-function getInitialLocale(searchParams: URLSearchParams): Locale {
-  const lang = searchParams.get("lang");
-  if (lang === "es") return "es";
-  return "en";
-}
+import { NawalCalculator } from "./NawalCalculator";
 
 function getLocalDateString(d = new Date()): string {
   const y = d.getFullYear();
@@ -22,11 +16,15 @@ function getLocalDateString(d = new Date()): string {
 }
 
 export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug: string }) {
-  const searchParams = useSearchParams();
-  const [locale, setLocale] = useState<Locale>(() => getInitialLocale(searchParams));
-
-  const [birthdayInput, setBirthdayInput] = useState("");
-  const [computedNawal, setComputedNawal] = useState<TzolkinDate | null>(null);
+  // Query params are read post-mount so the journey renders into the static HTML
+  // (useSearchParams would force a client-side bailout under static export).
+  const [locale, setLocale] = useState<Locale>("en");
+  const [unsubscribed, setUnsubscribed] = useState(false);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("lang") === "es") setLocale("es");
+    if (params.get("unsubscribed") === "1") setUnsubscribed(true);
+  }, []);
 
   // Accordion state — initialized post-mount in useEffect to avoid hydration mismatch
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
@@ -260,7 +258,7 @@ export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug:
       )}
 
       {/* ═══ UNSUBSCRIBE CONFIRMATION BANNER ═══ */}
-      {searchParams.get("unsubscribed") === "1" && (
+      {unsubscribed && (
         <section className="relative px-6 pb-4 max-w-2xl mx-auto">
           <p role="status" className="text-center text-sm text-foreground/90 border border-gold/40 rounded-full px-5 py-3">
             {ui.unsubscribedBanner}
@@ -451,92 +449,7 @@ export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug:
               <p className="font-[family-name:var(--font-cormorant)] text-base md:text-lg tracking-[0.15em] text-gold/50 mt-1">{ui.yourNawalAlt}</p>
             </div>
 
-            {!computedNawal ? (
-              <>
-                <p className="font-[family-name:var(--font-cormorant)] text-lg md:text-xl leading-relaxed text-foreground/90 max-w-2xl mx-auto mb-10">
-                  {ui.nawalExplanation}
-                </p>
-
-                <p className="text-sm tracking-[0.2em] text-foreground/55 mb-6">
-                  {ui.nawalCta}
-                </p>
-
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    if (birthdayInput) {
-                      const date = new Date(birthdayInput + "T12:00:00");
-                      setComputedNawal(getTzolkinDate(date));
-                    }
-                  }}
-                  className="flex flex-col items-center gap-4"
-                >
-                  <input
-                    type="date"
-                    value={birthdayInput}
-                    onChange={(e) => setBirthdayInput(e.target.value)}
-                    className="bg-background border border-gold/30 text-foreground/90 px-4 py-3 rounded-lg text-center tracking-wider focus:outline-none focus:border-gold/60 transition-colors w-56"
-                    required
-                  />
-                  <button
-                    type="submit"
-                    className="text-sm tracking-[0.3em] uppercase px-8 py-3 border border-gold/30 text-gold/70 rounded-full hover:bg-gold/10 hover:border-gold/50 hover:text-gold transition-all"
-                  >
-                    {ui.nawalSubmit}
-                  </button>
-                </form>
-              </>
-            ) : (
-              <>
-                <div className="flex justify-center mb-6">
-                  <img
-                    src={getGlyphPath(computedNawal.daySign)}
-                    alt={computedNawal.daySign.name}
-                    className="w-36 h-36 md:w-44 md:h-44 opacity-60"
-                    style={{ filter: "invert(78%) sepia(30%) saturate(600%) hue-rotate(5deg) brightness(90%)" }}
-                  />
-                </div>
-
-                <h2 className="font-[family-name:var(--font-cormorant)] text-4xl md:text-5xl font-light gold-gradient-text mb-2">
-                  {computedNawal.displayName}
-                </h2>
-                <p className="text-lg tracking-[0.15em] uppercase text-foreground/55 mb-4">
-                  {getDaySignNameLocalized(computedNawal.daySign.englishName)}
-                </p>
-
-                <div className="flex flex-wrap justify-center gap-3 mb-8">
-                  {computedNawal.daySign.themes.map((theme) => (
-                    <span
-                      key={theme}
-                      className="text-sm tracking-[0.2em] uppercase px-4 py-1.5 border border-gold/20 text-gold/60 rounded-full"
-                    >
-                      {getThemeLocalized(theme)}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="mayan-divider w-24 mx-auto mb-10" />
-
-                <div className="max-w-2xl mx-auto space-y-6 text-center">
-                  <p className="text-sm tracking-[0.2em] text-foreground/75">
-                    {ui.nawalTone} {computedNawal.tone.number} ({computedNawal.tone.name}) · {computedNawal.tone.meaning}
-                  </p>
-                  <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-foreground/90 italic">
-                    {computedNawal.tone.description}
-                  </p>
-
-                  <div className="mayan-divider w-16 mx-auto" />
-
-                  <p className="font-[family-name:var(--font-cormorant)] text-lg leading-relaxed text-foreground/90">
-                    {computedNawal.daySign.description}
-                  </p>
-
-                  <p className="text-sm tracking-[0.2em] text-foreground/45">
-                    {ui.nawalElement}: {computedNawal.daySign.element} · {ui.nawalDirection}: {computedNawal.daySign.direction}
-                  </p>
-                </div>
-              </>
-            )}
+            <NawalCalculator locale={locale} />
           </div>
         </section>
       )}
@@ -683,6 +596,13 @@ export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug:
             ))}
           </p>
         </div>
+        <nav className="flex flex-wrap justify-center gap-6 mt-8 text-sm tracking-[0.2em] uppercase">
+          {/* "/" is the static-root landing page, not a Next.js route */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a href="/" className="text-foreground/25 hover:text-gold/50 transition-colors">Home</a>
+          <a href="/about" className="text-foreground/25 hover:text-gold/50 transition-colors">About</a>
+          <a href="/privacy" className="text-foreground/25 hover:text-gold/50 transition-colors">Privacy</a>
+        </nav>
       </footer>
     </main>
   );
