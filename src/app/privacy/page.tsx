@@ -150,12 +150,33 @@ export default function PrivacyPage() {
                     .
                   </li>
                   <li>
+                    <strong>Resend:</strong> Daily journey emails are delivered
+                    through Resend, which processes your email address to send
+                    them.
+                  </li>
+                  <li>
                     <strong>Cloudflare:</strong> Our website is served through
                     Cloudflare&apos;s CDN, which may process basic request data
                     (IP address, user agent) for security and performance.
                   </li>
                 </ul>
               </div>
+            </section>
+
+            {/* ── Daily Journey Emails ── */}
+            <section>
+              <h2 className="font-[family-name:var(--font-cormorant)] text-2xl font-light gold-gradient-text mb-4">
+                Daily Journey Emails
+              </h2>
+              <p>
+                If you choose &ldquo;Remind me&rdquo; on your journey page, we
+                store your email address, your stay dates, and your language
+                preference so we can send one email each morning of your stay.
+                The emails stop on their own after checkout. Every email
+                includes an unsubscribe link that takes effect immediately, and
+                you can ask us to delete your address at any time by writing to
+                stay@templia.art.
+              </p>
             </section>
 
             {/* ── Cookies & Analytics ── */}
