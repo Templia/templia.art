@@ -7,6 +7,10 @@
         <meta name="description" content="Templia Art is a Mayan-inspired luxury villa in Aldea Zama, Tulum. Private pool, jungle garden, Mayan firepit. Personalized Tzolk'in calendar-guided experiences for each stay. Up to 4 guests." />
         <link rel="canonical" href="https://templia.art/" />
 
+        <!-- Preload the hero background: it's a CSS background-image, so the
+             preload scanner can't discover it until the CSSOM is built. -->
+        <link rel="preload" as="image" href="assets/images/image00015.jpg" fetchpriority="high" />
+
         <!-- Open Graph -->
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Templia Art" />
@@ -226,45 +230,114 @@
 
             .site-header {
                 position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 20px;
+                top: 28px;
+                right: 40px;
                 z-index: 1000;
+            }
+
+            /* Smoked-glass plate behind the wordmark. Darkening the backdrop
+               pulls the photo's highlights down toward the plate, so the light
+               mark keeps its contrast wherever the image lands behind it —
+               more robust than a light plate, which lifts dark foliage upward.
+               The gold rules echo the Tzolk'in pages. */
+            .site-logo-plate {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 16px 30px 13px;
+                text-decoration: none;
+                background: rgba(28, 28, 30, 0.58);
+                -webkit-backdrop-filter: blur(14px) saturate(125%);
+                backdrop-filter: blur(14px) saturate(125%);
+                border: 1px solid rgba(176, 141, 74, 0.65);
+                border-radius: 2px;
+            }
+
+            /* Inset second rule — a classic print framing device, and the
+               reason the plate reads as deliberate rather than as a patch. */
+            .site-logo-plate::after {
+                content: "";
+                position: absolute;
+                inset: 5px;
+                border: 1px solid rgba(176, 141, 74, 0.5);
+                border-radius: 1px;
+                pointer-events: none;
+            }
+
+            /* No backdrop-filter (older Firefox, some in-app browsers):
+               fall back to a more opaque tint so the mark stays legible. */
+            @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+                .site-logo-plate {
+                    background: rgba(28, 28, 30, 0.88);
+                }
+            }
+
+            .site-glyph {
+                width: 24px;
+                height: 24px;
+                display: block;
+                margin-bottom: 9px;
+                color: rgba(176, 141, 74, 0.95);
+            }
+
+            .site-wordmark {
+                margin: 0;
+                font-size: 0; /* kill the inline-image baseline gap */
             }
 
             .site-logo {
-                height: 60px;
+                height: 44px;
                 display: block;
                 width: auto;
-                opacity: 0.75;
             }
 
-            .site-identity {
-                position: fixed;
-                bottom: 52px;
-                left: 50px;
-                z-index: 1000;
-            }
-
-            .site-identity h1 {
-                margin: 0;
+            /* Location line — the rule stretches the full inner width, which is
+               what makes the stack read as one lockup rather than three items. */
+            .site-sub {
+                align-self: stretch;
+                margin: 11px 0 0;
+                padding-top: 9px;
+                border-top: 1px solid rgba(176, 141, 74, 0.5);
                 font-family: "Didot", "Bodoni MT", Georgia, serif;
-                font-size: 1.15rem;
-                font-weight: 400;
-                letter-spacing: 0.18em;
+                font-size: 0.7rem;
+                letter-spacing: 0.2em;
                 text-transform: uppercase;
-                color: #ffffff;
-                text-shadow: 0 1px 8px rgba(0,0,0,0.4);
+                text-align: center;
+                white-space: nowrap;
+                color: rgba(176, 141, 74, 0.95);
             }
 
-            .site-identity p {
-                margin: 4px 0 0;
-                font-family: "Avenir Next", Avenir, "Trebuchet MS", sans-serif;
-                font-size: 0.78rem;
-                font-weight: 400;
-                letter-spacing: 0.07em;
-                color: rgba(255,255,255,0.65);
-                text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+            @media (max-width: 560px) {
+                .site-header {
+                    top: 16px;
+                    right: 16px;
+                }
+
+                .site-logo-plate {
+                    padding: 11px 18px 9px;
+                }
+
+                .site-logo-plate::after {
+                    inset: 4px;
+                }
+
+                .site-glyph {
+                    width: 17px;
+                    height: 17px;
+                    margin-bottom: 6px;
+                }
+
+                .site-logo {
+                    height: 28px;
+                }
+
+                .site-sub {
+                    margin-top: 8px;
+                    padding-top: 6px;
+                    font-size: 0.55rem;
+                    letter-spacing: 0.16em;
+                }
             }
 
             .site-description {
@@ -278,17 +351,26 @@
     </head>
     <body>
         <header class="site-header">
-            <a href="https://templia.art/" aria-label="Templia Art home">
-                <img src="assets/images/logo.svg" alt="Templia Art" class="site-logo" />
+            <a href="https://templia.art/" class="site-logo-plate">
+                <!-- Diamond glyph, inlined so it inherits colour via currentColor
+                     and costs no extra request. Decorative: the <h1> carries the name. -->
+                <svg class="site-glyph" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
+                    <polygon points="60,18 92,60 60,102 28,60" fill="currentColor" />
+                    <g stroke="currentColor" stroke-width="3.5" stroke-linecap="square">
+                        <line x1="35" y1="35" x2="15" y2="15" />
+                        <line x1="85" y1="35" x2="105" y2="15" />
+                        <line x1="35" y1="85" x2="15" y2="105" />
+                        <line x1="85" y1="85" x2="105" y2="105" />
+                    </g>
+                </svg>
+                <h1 class="site-wordmark">
+                    <img src="assets/images/logo-light.svg" alt="Templia Art" class="site-logo" />
+                </h1>
+                <p class="site-sub">Aldea Zama &middot; Tulum, Mexico</p>
             </a>
         </header>
         <div class="bg" role="img" aria-label="Templia Art jungle villa in Tulum, Mexico"></div>
 
-        <!-- Property identity overlay -->
-        <div class="site-identity">
-            <h1>Templia Art</h1>
-            <p>Aldea Zama · Tulum, Mexico</p>
-        </div>
 
         <!-- SEO-accessible description (off-screen) -->
         <main class="site-description">
