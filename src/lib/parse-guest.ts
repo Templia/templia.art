@@ -11,6 +11,8 @@ interface Frontmatter {
   checkout: string;
   location: string;
   subtitle: string;
+  /** Optional: "cards" shows the day-by-day section as day cards. */
+  layout?: string;
 }
 
 function parseFrontmatter(content: string): { frontmatter: Frontmatter; body: string } {
@@ -295,6 +297,7 @@ export function parseGuestFile(filename: string): { slug: string; journey: Guest
     locationSubtitle: frontmatter.subtitle,
     checkIn: frontmatter.checkin,
     checkOut: frontmatter.checkout,
+    layout: frontmatter.layout === "cards" ? "cards" : undefined,
     welcomeMessage: welcomeEn,
     nawal: nawalEn,
     days: enDays,

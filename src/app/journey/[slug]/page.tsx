@@ -121,7 +121,7 @@ export default async function JourneyPage({ params }: { params: Promise<{ slug: 
     <>
       <JourneyJsonLd journey={journey} />
       <BreadcrumbJsonLd slug={slug} journey={journey} />
-      <JourneyContent journey={journey} slug={slug} />
+      <JourneyContent journey={journey} slug={slug} layout={journey.layout ?? "classic"} />
     </>
   );
 }

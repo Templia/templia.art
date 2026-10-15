@@ -26,6 +26,14 @@ export interface TzolkinDate {
   displayName: string; // e.g. "6 Kawoq"
 }
 
+// The four directions of Maya cosmology, each with its color road.
+export const DIRECTION_MEANINGS: Record<string, { color: string; title: string; text: string }> = {
+  East: { color: "Red", title: "Where the sun is born", text: "The red road of birth, new light and first intentions." },
+  North: { color: "White", title: "Realm of wind and ancestors", text: "The white road of clarity, breath and inherited wisdom." },
+  West: { color: "Black", title: "Where the sun descends", text: "The black road of introspection, release and transformation." },
+  South: { color: "Yellow", title: "Land of the ripened maize", text: "The yellow road of growth, abundance and harvest." },
+};
+
 export const DAY_SIGNS: DaySign[] = [
   {
     number: 1, name: "Imox", englishName: "Crocodile", glyph: "🐊", svgFile: "imox.svg",

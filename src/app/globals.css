@@ -153,3 +153,586 @@ body::after {
 .animation-delay-400 { animation-delay: 0.4s; }
 .animation-delay-600 { animation-delay: 0.6s; }
 .animation-delay-800 { animation-delay: 0.8s; }
+
+/* ═══ Day cards ═══
+   One palette per Maya direction. Each card exposes the same five tokens so
+   every viz and control inside reads from them:
+   --card-bg      surface
+   --card-ink     text + strongest data mark
+   --card-strong  primary data fill (past / highlighted)
+   --card-soft    secondary data fill (future / base cells)
+   --card-accent  one hot accent per card (current value) */
+.day-card {
+  --card-bg: #c9b48f;
+  --card-ink: #22180c;
+  --card-strong: #5a4228;
+  --card-soft: #b29a72;
+  --card-accent: #8a3a1c;
+  background: var(--card-bg);
+  color: var(--card-ink);
+  padding: 20px;
+  min-height: 480px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 20px 40px -24px rgba(0, 0, 0, 0.6);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.day-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 28px 48px -24px rgba(0, 0, 0, 0.7);
+}
+/* East · red — terracotta */
+.day-card[data-dir="east"] {
+  --card-bg: #d39a7c;
+  --card-ink: #2e130a;
+  --card-strong: #6e2c18;
+  --card-soft: #bf8164;
+  --card-accent: #a8401f;
+}
+/* North · white — bone */
+.day-card[data-dir="north"] {
+  --card-bg: #e7dfcc;
+  --card-ink: #221c12;
+  --card-strong: #6f6248;
+  --card-soft: #cfc4aa;
+  --card-accent: #a8862f;
+}
+/* West · black — jungle sage */
+.day-card[data-dir="west"] {
+  --card-bg: #8fa08a;
+  --card-ink: #141c14;
+  --card-strong: #2b3a2b;
+  --card-soft: #778a72;
+  --card-accent: #2f5e4e;
+}
+/* South · yellow — ochre */
+.day-card[data-dir="south"] {
+  --card-bg: #e4b56f;
+  --card-ink: #2c1a08;
+  --card-strong: #6a3c15;
+  --card-soft: #cf9d58;
+  --card-accent: #c0601f;
+}
+
+@media (min-width: 768px) { .day-card { padding: 24px; } }
+.day-card-viz { min-height: 200px; }
+.day-card-blocks { min-height: 200px; }
+
+/* ── Stone variant: greyed palettes, one full-width card per row ──
+   Each card sits in a .day-card-frame (an inline-size container), so type,
+   padding and the block row scale with the card's own width. */
+.day-cards-stone .day-card[data-dir="east"] {
+  --card-bg: #b9aca5; --card-ink: #231b18; --card-strong: #574843;
+  --card-soft: #a89a92; --card-accent: #8a5646;
+}
+.day-cards-stone .day-card[data-dir="north"] {
+  --card-bg: #d8d5ce; --card-ink: #1e1d1a; --card-strong: #5d5a53;
+  --card-soft: #c5c1b8; --card-accent: #8b8470;
+}
+.day-cards-stone .day-card[data-dir="west"] {
+  --card-bg: #9ca29e; --card-ink: #151917; --card-strong: #39403c;
+  --card-soft: #8c938e; --card-accent: #4d665d;
+}
+.day-cards-stone .day-card[data-dir="south"] {
+  --card-bg: #c8bdab; --card-ink: #252017; --card-strong: #5c513f;
+  --card-soft: #b7ac98; --card-accent: #977748;
+}
+.day-card-frame { container-type: inline-size; }
+.day-card-frame .day-card {
+  min-height: 0;
+  padding: clamp(20px, 5cqi, 48px);
+}
+.day-card-frame .day-card-eyebrow { font-size: clamp(10.5px, 1.6cqi, 13px); }
+.day-card-frame .day-card-stat { font-size: clamp(3.25rem, 11cqi, 6.5rem); }
+.day-card-frame .day-card-body { font-size: clamp(13px, 2.4cqi, 18px); max-width: 40ch; }
+.day-card-frame .day-card-meta { font-size: clamp(10.5px, 1.5cqi, 12.5px); }
+.day-card-frame .day-card-meta-value { font-size: clamp(15px, 2.6cqi, 22px); }
+.day-card-frame .day-card-viz,
+.day-card-frame .day-card-blocks { min-height: 0; }
+.day-card-frame .day-card-blocks { flex: none; aspect-ratio: 16 / 9; }
+.day-card-small {
+  font-size: clamp(12.5px, 2cqi, 15px);
+  line-height: 1.5;
+  opacity: 0.85;
+}
+/* Rich glyph layout: glyph | tone over direction; direction drops below on narrow cards */
+.day-card-rich-blocks {
+  display: grid;
+  gap: 3px;
+  grid-template-columns: 1.6fr 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas: "glyph tone" "glyph dir";
+  flex: 1;
+  min-height: clamp(220px, 36cqi, 280px);
+}
+.day-card-rich-dir { padding: clamp(10px, 2cqi, 16px); }
+.day-card-rich-tone { width: clamp(52px, 10cqi, 72px); aspect-ratio: 1; }
+@container (max-width: 560px) {
+  .day-card-rich-blocks {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(200px, 1fr) auto auto;
+    grid-template-areas: "glyph" "tone" "dir";
+  }
+  /* On phone-width cards the back keeps the reading only, so it doesn't
+     out-grow the front; the activity list is one tap away via "Open day". */
+  .day-card-back-rhythm { display: none; }
+  }
+.day-card-frame .day-card-pill { font-size: clamp(11.5px, 1.6cqi, 14px); padding: 0.6em 1.25em; }
+
+.day-card-eyebrow {
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+.day-card-stat {
+  font-family: var(--font-cormorant), var(--font-serif);
+  font-size: 3.25rem;
+  line-height: 0.95;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.day-card-body {
+  font-size: 13px;
+  line-height: 1.5;
+  opacity: 0.85;
+  max-width: 28ch;
+}
+.day-card-meta {
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.day-card-meta-value {
+  font-family: var(--font-cormorant), var(--font-serif);
+  font-size: 15px;
+  letter-spacing: 0;
+  text-transform: none;
+  font-weight: 600;
+  margin-top: 2px;
+}
+.day-card-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--card-ink);
+  color: var(--card-bg);
+}
+.day-card-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, white 82%, var(--card-bg));
+  color: var(--card-ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  transition: background 0.2s ease, gap 0.2s ease;
+}
+.day-card:hover .day-card-pill { gap: 12px; background: white; }
+
+.day-card-rule { background: color-mix(in srgb, var(--card-ink) 18%, transparent); }
+.day-card-rule-border { border-color: color-mix(in srgb, var(--card-ink) 22%, transparent); }
+
+.day-card-bar { border-radius: 2px 2px 0 0; z-index: 1; }
+.day-card-bar[data-state="past"] { background: var(--card-strong); }
+.day-card-bar[data-state="now"] { background: var(--card-ink); }
+.day-card-bar[data-state="now"]::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -10px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  background: var(--card-accent);
+}
+.day-card-bar[data-state="next"] { background: var(--card-soft); }
+
+.day-card-cell { border-radius: 1.5px; background: var(--card-soft); }
+.day-card-cell[data-state="stay"] { background: var(--card-strong); }
+.day-card-cell[data-state="now"] {
+  background: var(--card-accent);
+  box-shadow: 0 0 0 1.5px var(--card-ink);
+}
+
+.day-card-block-strong { background: var(--card-strong); }
+.day-card-block-accent { background: var(--card-accent); }
+.day-card-on-accent { color: var(--card-bg); }
+.day-card-glyph {
+  background: var(--card-bg);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+/* ── Flip card: both faces stacked in one grid cell ── */
+.day-card-flip { perspective: 1600px; cursor: pointer; border-radius: 14px; outline: none; }
+.day-card-flip:focus-visible { box-shadow: 0 0 0 2px var(--color-gold); }
+.day-card-flip-inner {
+  display: grid;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.day-card-flip[data-flipped="true"] .day-card-flip-inner { transform: rotateY(180deg); }
+.day-card-face {
+  grid-area: 1 / 1;
+  display: grid;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.day-card-face-back { transform: rotateY(180deg); }
+.day-card-flip .day-card:hover { transform: none; }
+.day-card-flip:hover .day-card-flip-inner { translate: 0 -3px; }
+@media (prefers-reduced-motion: reduce) {
+  .day-card-flip-inner { transition: none; }
+}
+.day-card-back-title {
+  font-family: var(--font-cormorant), var(--font-serif);
+  font-size: clamp(1.75rem, 5cqi, 2.75rem);
+  line-height: 1.05;
+  font-weight: 500;
+}
+.day-card-back-text {
+  font-family: var(--font-cormorant), var(--font-serif);
+  font-size: clamp(17px, 2.6cqi, 21px);
+  line-height: 1.45;
+  font-weight: 500;
+  max-width: 60ch;
+}
+.day-card-back-rhythm {
+  display: grid;
+  gap: 12px 24px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  border-top: 1px solid color-mix(in srgb, var(--card-ink) 18%, transparent);
+  padding-top: 16px;
+}
+
+/* ── Corner art: patterns and glyphs that bleed off the card edge ── */
+.day-card > * { position: relative; z-index: 1; }
+.day-card > .day-card-dial,
+.day-card > .day-card-back-glyph { position: absolute; z-index: 0; pointer-events: none; }
+/* Tzolk'in dial (TzolkinDial.tsx): centered on the top-right corner, so a
+   quarter shows, with the day's sign and tone pointing into the card. */
+.day-card-dial {
+  --dial-r: clamp(140px, 30cqi, 240px);
+  top: 0;
+  right: 0;
+  width: calc(var(--dial-r) * 2);
+  aspect-ratio: 1;
+  translate: 50% -50%;
+}
+.dial-line { fill: none; stroke: color-mix(in srgb, var(--card-ink) 22%, transparent); stroke-width: 1; }
+.dial-selected { fill: var(--card-accent); }
+.dial-glyph { filter: none; }
+.dial-glyph-selected { filter: invert(1); opacity: 0.92; }
+.dial-numeral { fill: var(--card-ink); }
+.dial-numeral-selected { fill: var(--card-bg); }
+.dial-pointer { stroke: var(--card-accent); stroke-width: 3; stroke-linecap: round; }
+.day-card-back-glyph {
+  right: 0;
+  bottom: 0;
+  width: clamp(260px, 62cqi, 520px);
+  aspect-ratio: 612 / 792;
+  transform: translate(26%, 22%) rotate(-8deg);
+  background: color-mix(in srgb, var(--card-ink) 6%, transparent);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+}
+
+/* Guest name: the card's personal signature, set in the serif voice */
+.day-card-guest {
+  font-family: var(--font-cormorant), var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(17px, 2.8cqi, 24px);
+  line-height: 1.1;
+}
+
+/* ═══ Codex deck (Example 3) ═══
+   Paper cards with an inset ink frame. --pict carries the direction color
+   for the pictogram; --paper is the cut-out color inside it. */
+.codex-cards .day-card {
+  --card-bg: #efe8d9;
+  --paper: #efe8d9;
+  --card-ink: #2a231b;
+  --card-strong: #4a3f33;
+  --card-soft: #d9cfbb;
+  --card-accent: #8a6d3b;
+  --stone: #4a4239;
+  --relief: #e2d9c6;
+  outline: 1.5px solid var(--card-ink);
+  outline-offset: -9px;
+}
+.codex-cards .day-card[data-dir="east"] { --pict: #a3352b; }
+.codex-cards .day-card[data-dir="north"] { --pict: #2f8288; }
+.codex-cards .day-card[data-dir="west"] { --pict: #2d2620; }
+.codex-cards .day-card[data-dir="south"] { --pict: #d0921c; }
+/* At least a 5:8 tarot shape (160cqi = 1.6 × card width); grows if the back needs more */
+.codex-cards .day-card.codex-card { padding: 9px; min-height: 160cqi; }
+.codex-cards .day-card-back .day-card-back-text { font-size: clamp(15px, 4.4cqi, 17px); line-height: 1.45; }
+.codex-cards .day-card-back .day-card-back-title { font-size: clamp(1.5rem, 7cqi, 2rem); }
+.codex-cards .day-card.day-card-back { padding: clamp(24px, 7cqi, 36px); }
+.codex-frieze { display: block; width: 100%; height: auto; border-radius: 6px 6px 0 0; }
+.codex-body { padding: clamp(14px, 5cqi, 22px) clamp(14px, 5cqi, 22px) clamp(16px, 5cqi, 24px); }
+.codex-art { position: relative; min-height: 140px; }
+.codex-pictogram {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 108%;
+  aspect-ratio: 1;
+  translate: -40% -50%;
+  color: var(--pict);
+}
+/* Alternate cards break the frame on the left instead of the right */
+.codex-card[data-bleed="left"] .codex-pictogram { translate: -60% -50%; }
+.codex-art .cx-glyph-fallback {
+  background: var(--pict);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+.cx-cut { fill: var(--paper); }
+.cx-cut-line { fill: none; stroke: var(--paper); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.cx-cut-line-heavy { stroke-width: 11; }
+.cx-ink-line { fill: none; stroke: currentColor; stroke-width: 6; stroke-linecap: round; }
+.cx-stone { fill: var(--stone); }
+.cx-stone-line { fill: none; stroke: var(--stone); stroke-width: 1.5; }
+.cx-relief { fill: var(--relief); }
+.cx-relief-line { fill: none; stroke: var(--relief); stroke-width: 3.2; stroke-linejoin: round; stroke-linecap: round; }
+.codex-plate { text-align: center; position: relative; }
+.codex-plate::before {
+  content: "";
+  display: block;
+  height: 1.5px;
+  margin: 0 auto 12px;
+  width: 40%;
+  background: var(--card-ink);
+  opacity: 0.6;
+}
+.codex-name {
+  font-family: var(--font-cormorant), var(--font-serif);
+  font-weight: 600;
+  font-size: clamp(1.75rem, 9cqi, 2.6rem);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.codex-sub {
+  font-size: clamp(10.5px, 3cqi, 12px);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-top: 8px;
+  opacity: 0.75;
+}
+
+/* Animated glyph (AnimatedGlyph.tsx): inline SVG traced in the card's paper color */
+.day-card-glyph-live { color: var(--card-bg); }
+.day-card-glyph-live svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.day-card-glyph-live .glyph-shape {
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 1.4px;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+
+/* ═══ Wheel composition (Example 4) ═══
+   Geometry in card-width units (cqi), shared by the wheel, the day's glyph
+   and the text float, so the composition scales as one piece:
+   --R wheel radius · --cx/--cy wheel center · --pad card padding · --gap text gap
+   The wheel is far larger than the card and centered off its right edge, so
+   only the arc around the day's spoke shows. */
+.wheel-card {
+  --R: 92cqi;
+  --cx: 142cqi;
+  --cy: 34cqi;
+  --pad: 5cqi;
+  --gap: 2.5cqi;
+  padding: var(--pad);
+  min-height: calc(var(--cy) * 2);
+  display: flex;
+  flex-direction: column;
+}
+.wheel-card > .wheel-art { position: absolute; z-index: 0; pointer-events: none; }
+.wheel-art {
+  left: calc(var(--cx) - var(--R));
+  top: calc(var(--cy) - var(--R));
+  width: calc(var(--R) * 2);
+  aspect-ratio: 1;
+}
+.wheel-svg { display: block; width: 100%; height: 100%; }
+.wheel-svg-narrow { display: none; }
+/* Spin into place (SpinningWheel.tsx): armed = turned away, go = settle.
+   Each ring rotates about the wheel's center (0,0 in the viewBox) with its
+   own start angle, direction and easing, and they converge on the day. */
+.wheel-ring { transform-box: view-box; transform-origin: 0 0; }
+/* Outer direction ring + label: furthest travel, slow, a gentle overshoot */
+.wheel-art[data-spin="armed"] .wheel-ring-dir { transform: rotate(-90deg); }
+.wheel-art[data-spin="go"] .wheel-ring-dir {
+  transform: rotate(0deg);
+  transition: transform 2.6s cubic-bezier(0.22, 1.12, 0.36, 1);
+}
+/* Sign ring: turns the opposite way, quick start and a long glide in */
+.wheel-art[data-spin="armed"] .wheel-ring-sign { transform: rotate(60deg); }
+.wheel-art[data-spin="go"] .wheel-ring-sign {
+  transform: rotate(0deg);
+  transition: transform 2.1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+/* Tone ring: starts a beat later and lands with a springy bounce */
+.wheel-art[data-spin="armed"] .wheel-ring-tone { transform: rotate(-120deg); }
+.wheel-art[data-spin="go"] .wheel-ring-tone {
+  transform: rotate(0deg);
+  transition: transform 2.3s cubic-bezier(0.34, 1.45, 0.64, 1) 0.2s;
+}
+/* Direction ring: every sign's direction color; the day's at full strength */
+.wheel-dir { opacity: 0.5; }
+.wheel-dir[data-selected] { opacity: 1; }
+/* Other days recede: pale grey glyphs and numerals, so the day stands out */
+.wheel-glyph-muted { opacity: 0.14; }
+.wheel-numeral-muted { opacity: 0.18; }
+.wheel-dir-east { fill: #a5553f; }
+.wheel-dir-north { fill: #ece7dc; }
+.wheel-dir-west { fill: #1c201e; }
+.wheel-dir-south { fill: #c99a3c; }
+.wheel-label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  fill: var(--card-ink);
+}
+/* The text column wraps the wheel's curve; the float stops at the card's
+   own height so it never stretches the card. */
+.wheel-float {
+  float: right;
+  width: calc(100cqi - var(--pad) - var(--cx) + var(--R) + var(--gap));
+  /* Leaves room below for the footer, which stays in the text column */
+  height: calc(var(--cy) * 2 - var(--pad) * 2 - 56px);
+  shape-outside: circle(calc(var(--R) + var(--gap)) at calc(var(--R) + var(--gap)) calc(var(--cy) - var(--pad)));
+}
+.wheel-card .wheel-stat { font-size: clamp(3rem, 9cqi, 5.25rem); }
+.wheel-facts { margin-top: clamp(16px, 4cqi, 32px); }
+.wheel-footer {
+  padding-top: 16px;
+  margin-top: auto;
+  /* Footer stays in the text column, clear of the wheel */
+  max-width: calc(var(--cx) - var(--R) - var(--gap) - var(--pad));
+}
+
+/* Narrow cards: the wheel hangs from the top, its spoke pointing down */
+@container (max-width: 560px) {
+  .wheel-card {
+    --R: 120cqi;
+    --cx: 50cqi;
+    --cy: -54cqi;
+    min-height: 0;
+  }
+  .wheel-svg-wide { display: none; }
+  .wheel-svg-narrow { display: block; }
+  .wheel-float {
+    float: none;
+    width: auto;
+    height: calc(var(--cy) + var(--R) - var(--pad) + 4cqi);
+    shape-outside: none;
+  }
+  .wheel-footer { max-width: none; }
+  /* No spin on phone-width cards: the wheel simply rests on the day */
+  .wheel-art[data-spin] .wheel-ring { transform: none; transition: none; }
+}
+
+/* ═══ Journey page with day cards (JourneyDayCards.tsx) ═══ */
+/* Open card: the day's reading sits inside the card, below the blocks */
+.journey-reading {
+  margin-top: clamp(20px, 4cqi, 32px);
+  padding-top: clamp(20px, 4cqi, 32px);
+  border-top: 1px solid color-mix(in srgb, var(--card-ink) 18%, transparent);
+}
+.journey-activities {
+  margin-top: clamp(20px, 4cqi, 28px);
+  display: grid;
+  gap: 18px;
+  border-left: 1px solid color-mix(in srgb, var(--card-ink) 22%, transparent);
+  padding-left: 20px;
+}
+.journey-activities li { position: relative; }
+.journey-activities li::before {
+  content: "";
+  position: absolute;
+  left: -24px;
+  top: 4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--card-accent);
+}
+.journey-activity-text {
+  margin-top: 4px;
+  font-size: clamp(14px, 2.2cqi, 16px);
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+/* Closed card: a slim strip in the day's palette */
+.day-card.journey-card-closed {
+  min-height: 0;
+  width: 100%;
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 14px;
+}
+.journey-closed-tile {
+  width: 56px;
+  height: 56px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+}
+.journey-closed-glyph {
+  width: 34px;
+  aspect-ratio: 612 / 792;
+  background: var(--card-bg);
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+.journey-closed-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.journey-closed-stat {
+  font-family: var(--font-cormorant), var(--font-serif);
+  font-size: 1.6rem;
+  line-height: 1.05;
+  font-weight: 500;
+}
+.journey-closed-title {
+  font-size: 13px;
+  opacity: 0.8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@media (max-width: 480px) {
+  .journey-closed-open { padding: 7px 11px; }
+  .journey-closed-tile { width: 48px; height: 48px; }
+}

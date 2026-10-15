@@ -47,6 +47,8 @@ export interface GuestJourney {
   locationSubtitle: string;
   checkIn: string;
   checkOut: string;
+  /** Day-by-day presentation; set per guest via `layout: cards` in their .md file. */
+  layout?: "classic" | "cards";
   welcomeMessage?: string;
   nawal: GuestNawal;
   days: JourneyDay[];

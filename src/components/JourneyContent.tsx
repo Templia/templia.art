@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type GuestJourney } from "@/lib/journeys";
 import { getTzolkinDate, getGlyphPath, getDaySignByName } from "@/lib/tzolkin";
 import { type Locale, UI_STRINGS, DAY_SIGN_NAMES_ES, THEMES_ES, formatDateShortLocale, formatStayRange } from "@/lib/i18n";
 import { LanguageToggle } from "./LanguageToggle";
 import { RemindMe } from "./RemindMe";
 import { NawalCalculator } from "./NawalCalculator";
+import { JourneyDayCards } from "./JourneyDayCards";
 
 function getLocalDateString(d = new Date()): string {
   const y = d.getFullYear();
@@ -15,7 +16,16 @@ function getLocalDateString(d = new Date()): string {
   return `${y}-${m}-${dd}`;
 }
 
-export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug: string }) {
+export function JourneyContent({
+  journey,
+  slug,
+  layout = "classic",
+}: {
+  journey: GuestJourney;
+  slug: string;
+  /** "cards": the day-by-day section as stone day cards, one open at a time. */
+  layout?: "classic" | "cards";
+}) {
   // Query params are read post-mount so the journey renders into the static HTML
   // (useSearchParams would force a client-side bailout under static export).
   const [locale, setLocale] = useState<Locale>("en");
@@ -75,7 +85,9 @@ export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug:
       if (seen) {
         setWelcomeOpen(false);
       } else {
-        window.localStorage.setItem(welcomeKey, "1");
+        // Cards layout records the visit only once the guest has read past
+        // the welcome (see the effect below); classic marks it on load.
+        if (layout === "classic") window.localStorage.setItem(welcomeKey, "1");
         setWelcomeOpen(true);
       }
     } catch {
@@ -91,7 +103,45 @@ export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug:
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [journey.checkIn, journey.checkOut, journey.guestName]);
 
+  // Cards layout: mark the welcome as seen only after the guest has had it on
+  // screen and then scrolled past it. Opening and closing the page — or a
+  // #day-N link that jumps straight past it — leaves it open for next time.
+  const welcomeRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (layout !== "cards") return;
+    const el = welcomeRef.current;
+    if (!el) return;
+    try {
+      if (window.localStorage.getItem(welcomeKey)) return;
+    } catch {
+      return;
+    }
+    let wasOnScreen = false;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          wasOnScreen = true;
+        } else if (wasOnScreen && entry.boundingClientRect.bottom < 0) {
+          try {
+            window.localStorage.setItem(welcomeKey, "1");
+          } catch {
+            // Storage unavailable — nothing to remember
+          }
+          io.disconnect();
+        }
+      },
+      { threshold: 0 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [layout, welcomeKey]);
+
   function toggleDay(date: string) {
+    // Cards layout is a true accordion: opening one day closes the others.
+    if (layout === "cards") {
+      setExpandedDays((prev) => (prev.has(date) ? new Set() : new Set([date])));
+      return;
+    }
     setExpandedDays((prev) => {
       const next = new Set(prev);
       if (next.has(date)) next.delete(date);
@@ -173,7 +223,7 @@ export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug:
 
       {/* ═══ WELCOME MESSAGE (collapsible, per-device seen flag) ═══ */}
       {welcomeMessage && (
-        <section className="relative px-6 py-10 max-w-2xl mx-auto">
+        <section ref={welcomeRef} className="relative px-6 py-10 max-w-2xl mx-auto">
           <div className="text-center">
             <button
               type="button"
@@ -267,7 +317,7 @@ export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug:
       )}
 
       {/* ═══ EXPAND-ALL CONTROL ═══ */}
-      {days.length > 1 && (
+      {layout === "classic" && days.length > 1 && (
         <section className="relative px-6 pt-6 pb-2 max-w-3xl mx-auto">
           <div className="text-center">
             <button
@@ -282,7 +332,20 @@ export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug:
       )}
 
       {/* ═══ DAY-BY-DAY ITINERARY (collapsible per day) ═══ */}
-      {days.map((day, dayIndex) => {
+      {layout === "cards" ? (
+        <JourneyDayCards
+          days={days}
+          slug={slug}
+          locale={locale}
+          openDate={[...expandedDays][0] ?? null}
+          onToggle={toggleDay}
+          todayStr={todayStr}
+          upcomingDays={upcomingDays}
+          guestName={journey.guestName}
+          place={journey.locationName}
+        />
+      ) : (
+      days.map((day, dayIndex) => {
         const date = new Date(day.date + "T12:00:00");
         const tzolkin = getTzolkinDate(date);
         const isOpen = expandedDays.has(day.date);
@@ -388,7 +451,8 @@ export function JourneyContent({ journey, slug }: { journey: GuestJourney; slug:
             </div>
           </section>
         );
-      })}
+      })
+      )}
 
       {/* ═══ INTEGRATION SECTION (a look back over the stay — revealed from checkout day) ═══ */}
       {todayStr && todayStr >= journey.checkOut && (
