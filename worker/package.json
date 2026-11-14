@@ -7,7 +7,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "tail": "wrangler tail",
-    "test": "node test/mcp.test.mjs"
+    "test": "node test/mcp.test.mjs && node test/visits.test.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.83.0"

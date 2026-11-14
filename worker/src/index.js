@@ -17,6 +17,7 @@
 // New endpoints get a new `handle*` function plus a branch in `route()`.
 
 import { handleSubscribe, handleUnsubscribe, sendDailyEmails } from "./subscriptions.js";
+import { journeySlugFor, recordJourneyVisit } from "./visits.js";
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -1070,6 +1071,14 @@ function route(request) {
 
 export default {
   async fetch(request, env, ctx) {
+    // Count journey page loads in the background; never affects the response.
+    if (journeySlugFor(request)) {
+      ctx.waitUntil(
+        recordJourneyVisit(request, env).catch((err) =>
+          console.error("journey visit not recorded:", err && err.message)
+        )
+      );
+    }
     const handler = route(request);
     return handler(request, env, ctx);
   },
