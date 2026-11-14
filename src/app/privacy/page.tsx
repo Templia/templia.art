@@ -22,7 +22,7 @@ export default function PrivacyPage() {
           </h1>
 
           <p className="text-sm text-foreground/40 text-center mb-12">
-            Last updated: March 2026
+            Last updated: November 2026
           </p>
 
           <div className="mayan-divider w-24 mx-auto mb-16" />
@@ -189,6 +189,15 @@ export default function PrivacyPage() {
                 (light/dark mode) stored in your browser&apos;s localStorage. We
                 do not use analytics trackers, advertising cookies, or
                 third-party tracking scripts.
+              </p>
+              <p className="mt-4">
+                To know whether our guest journey pages are being used, we keep
+                a simple daily count of how many times each journey page is
+                opened, together with the visitor&apos;s country and whether
+                the visit came from a person, a link preview, or an automated
+                bot. This count is kept on our own server; it does not store
+                your IP address or browser details, sets no cookies, and cannot
+                be used to identify you.
               </p>
             </section>
 
