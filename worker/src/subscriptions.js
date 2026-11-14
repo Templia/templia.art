@@ -38,7 +38,7 @@ function requestNow(request, env) {
   return fake ? new Date(fake) : new Date();
 }
 
-function addDaysIso(iso, n) {
+export function addDaysIso(iso, n) {
   const d = new Date(iso + "T12:00:00Z");
   d.setUTCDate(d.getUTCDate() + n);
   return d.toISOString().slice(0, 10);
@@ -66,7 +66,7 @@ function newToken() {
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
-function escapeHtml(s) {
+export function escapeHtml(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
@@ -84,6 +84,7 @@ async function fetchDigest(env, slug) {
 function journeyUrl(env, digest, locale, dayNumber) {
   const u = new URL(`${siteBase(env)}/journey/${digest.slug}/`);
   if (locale === "es" && digest.locales.es) u.searchParams.set("lang", "es");
+  u.searchParams.set("via", "email"); // lets the visit counter attribute opens to the daily email
   return u.toString() + (dayNumber ? `#day-${dayNumber}` : "");
 }
 
@@ -97,7 +98,7 @@ function formatLongDate(iso, locale) {
 // Email
 // ---------------------------------------------------------------------------
 
-async function sendEmail(env, { to, subject, html, text, unsubscribeUrl }) {
+export async function sendEmail(env, { to, subject, html, text, unsubscribeUrl }) {
   const headers = unsubscribeUrl
     ? { "List-Unsubscribe": `<${unsubscribeUrl}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" }
     : undefined;
@@ -187,7 +188,7 @@ const COPY = {
 
 const SANS = "Helvetica,Arial,sans-serif";
 
-function layout(inner, footerHtml = "") {
+export function layout(inner, footerHtml = "") {
   return `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;background:#0a0a0a;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0a;padding:32px 16px;">
 <tr><td align="center">

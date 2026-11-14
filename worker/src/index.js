@@ -18,6 +18,7 @@
 
 import { handleSubscribe, handleUnsubscribe, sendDailyEmails } from "./subscriptions.js";
 import { journeySlugFor, recordJourneyVisit } from "./visits.js";
+import { sendOwnerSummary } from "./owner-summary.js";
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -1083,6 +1084,12 @@ export default {
     return handler(request, env, ctx);
   },
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(sendDailyEmails(env, new Date(event.scheduledTime)));
+    const now = new Date(event.scheduledTime);
+    ctx.waitUntil(sendDailyEmails(env, now));
+    ctx.waitUntil(
+      sendOwnerSummary(env, now).catch((err) =>
+        console.error("owner summary failed:", err && err.message)
+      )
+    );
   },
 };

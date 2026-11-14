@@ -34,6 +34,9 @@ export function journeySlugFor(request) {
   const url = new URL(request.url);
   const path = url.pathname;
 
+  // The owner's own checks: open any journey link with ?me to leave it uncounted.
+  if (url.searchParams.has("me")) return null;
+
   // Only count document loads, not Next.js prefetches / RSC fetches.
   const dest = request.headers.get("Sec-Fetch-Dest");
   if (dest && dest !== "document") return null;
@@ -52,6 +55,15 @@ export function journeySlugFor(request) {
   return null;
 }
 
+// Link tag from ?via=…: lets the owner tell "opened from the guest message"
+// (?via=guest) from other visits. Anything malformed is recorded as "other".
+export function viaFor(request) {
+  const raw = new URL(request.url).searchParams.get("via");
+  if (raw === null || raw === "") return "";
+  const v = raw.toLowerCase();
+  return /^[a-z0-9-]{1,24}$/.test(v) ? v : "other";
+}
+
 export async function recordJourneyVisit(request, env, now = new Date()) {
   const slug = journeySlugFor(request);
   if (!slug || !env.DB) return false;
@@ -59,12 +71,12 @@ export async function recordJourneyVisit(request, env, now = new Date()) {
   const country = (request.cf && request.cf.country) || "XX";
   const at = now.toISOString();
   await env.DB.prepare(
-    `INSERT INTO journey_visits (slug, day, kind, country, hits, first_at, last_at)
-     VALUES (?1, ?2, ?3, ?4, 1, ?5, ?5)
-     ON CONFLICT (slug, day, kind, country)
+    `INSERT INTO journey_visits (slug, day, kind, via, country, hits, first_at, last_at)
+     VALUES (?1, ?2, ?3, ?4, ?5, 1, ?6, ?6)
+     ON CONFLICT (slug, day, kind, via, country)
      DO UPDATE SET hits = hits + 1, last_at = excluded.last_at`
   )
-    .bind(slug, tulumToday(now), kind, country, at)
+    .bind(slug, tulumToday(now), kind, viaFor(request), country, at)
     .run();
   return true;
 }
