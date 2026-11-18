@@ -19,6 +19,7 @@
 import { handleSubscribe, handleUnsubscribe, sendDailyEmails } from "./subscriptions.js";
 import { journeySlugFor, recordJourneyVisit } from "./visits.js";
 import { sendOwnerSummary } from "./owner-summary.js";
+import { handleVisitsPage } from "./visits-page.js";
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -1066,6 +1067,9 @@ function route(request) {
   }
   if (pathname === "/api/unsubscribe" || pathname === "/api/unsubscribe/") {
     return handleUnsubscribe;
+  }
+  if (pathname === "/visits" || pathname === "/visits/") {
+    return handleVisitsPage;
   }
   return handleMarkdownOrPassthrough;
 }

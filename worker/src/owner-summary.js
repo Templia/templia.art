@@ -13,17 +13,17 @@ const DAYS_AFTER = 1; // and stop the day after checkout
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-function shortDate(iso) {
+export function shortDate(iso) {
   const d = new Date(iso + "T12:00:00Z");
   return `${MONTHS[d.getUTCMonth()]} ${d.getUTCDate()}`;
 }
 
-function daysBetween(a, b) {
+export function daysBetween(a, b) {
   return Math.round((new Date(b + "T12:00:00Z") - new Date(a + "T12:00:00Z")) / 86400e3);
 }
 
 // "Nov 13, 6:20 PM" in Tulum time (UTC-5, no DST).
-function tulumStamp(isoUtc) {
+export function tulumStamp(isoUtc) {
   const d = new Date(new Date(isoUtc).getTime() - 5 * 3600e3);
   let h = d.getUTCHours();
   const ampm = h >= 12 ? "PM" : "AM";
@@ -35,7 +35,7 @@ function plural(n, word) {
   return `${n} ${word}${n === 1 ? "" : "s"}`;
 }
 
-function stayPhase(j, today) {
+export function stayPhase(j, today) {
   const nights = daysBetween(j.check_in, j.check_out);
   if (today < j.check_in) {
     const n = daysBetween(today, j.check_in);
@@ -47,7 +47,7 @@ function stayPhase(j, today) {
 }
 
 // Sum visit rows ({day, kind, via, hits, first_at}) into the buckets the owner cares about.
-function tally(rows) {
+export function tally(rows) {
   const t = { guest: 0, email: 0, otherPeople: 0, previews: 0, people: 0 };
   for (const r of rows) {
     if (r.kind === "preview") t.previews += r.hits;
